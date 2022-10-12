@@ -8,6 +8,7 @@ Akademia Górniczo-Hutnicza
 *********************************************/
 
 #include"opt_alg.h"
+#include "user_funs.h"
 
 void lab1();
 void lab2();
@@ -20,7 +21,7 @@ int main()
 {
 	try
 	{
-
+        std::cout<<expansion(fun1,69,2,0.98,100);
 	}
 	catch (string EX_INFO)
 	{

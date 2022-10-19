@@ -11,7 +11,7 @@ matrix fun1(matrix x, matrix ud1, matrix ud2)
     y = -cos(0.1*x()) * exp(-pow((0.1 * x() - 2 * PI),2)) + 0.002*pow((0.1*x()),2);
     return y;
 }
-
+/*
 double*
 expansion(matrix (*ff)(matrix, matrix, matrix), double x, double d, double alpha, int N_max, matrix ud1, matrix ud2)
 {
@@ -59,4 +59,4 @@ expansion(matrix (*ff)(matrix, matrix, matrix), double x, double d, double alpha
     retval[0] = det(next_x);
     retval[1] = det(prev_x);
     return retval;
-}
+    }*/

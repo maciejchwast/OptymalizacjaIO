@@ -3,26 +3,26 @@ double* expansion(matrix(*ff)(matrix, matrix, matrix), double x, double d, doubl
 {
 	try
 	{
-		double* p = new double[2]{ 0,0 };
+		//double* p = new double[2]{ 0,0 };
 		//Tu wpisz kod funkcji
         static uint32_t call_count = 0;
         call_count++;
         int i = 0;
-        double* retval = new double [2];
+        double* p = new double [2];
         double x1 = x + d;
         if(ff(x1,0,0) == ff(x,0,0)){
-            retval[0] = x;
-            retval[1] = x1;
-            return retval;
+            p[0] = x;
+            p[1] = x1;
+            return p;
         }
 
         if(ff(x1,0,0) >ff(x,0,0)){
             d = -d;
             x1 = x +d;
             if(ff(x1,0,0) >= ff(x,0,0)){
-                retval[0] = x1;
-                retval[1] = x -d;
-                return retval;
+                p[0] = x1;
+                p[1] = x -d;
+                return p;
             }
         }
         matrix next_x = ff(x,0,0);
@@ -42,14 +42,15 @@ double* expansion(matrix(*ff)(matrix, matrix, matrix), double x, double d, doubl
 
         if(d>0)
         {
-            retval[0] = det(prev_x);
-            retval[1] = det(next_x);
-            return retval;
+            p[0] = det(prev_x);
+            p[1] = det(next_x);
+            return p;
         }
-        retval[0] = det(next_x);
-        retval[1] = det(prev_x);
-        return retval;
-		return p;
+        p[0] = det(next_x);
+        p[1] = det(prev_x);
+        std::cout<<p[0]<<std::endl<<p[1]<<std::endl;
+        return p;
+		//return p;
 	}
 	catch (string ex_info)
 	{
@@ -63,7 +64,55 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 	{
 		solution Xopt;
 		//Tu wpisz kod funkcji
+        double next_c;
+        int fi[100];
+        int k=100;
+        fi[0]=1;
+        fi[1]=1;
+        for(int i=2;i<100;i++)
+        {
+            fi[i]=fi[i-1]+fi[i-2];
+        }
 
+        double c = b - fi[k-1]/(fi[k]*b-a);
+        double d = a + b - c;
+        double next_a;
+        double next_b;
+        for(int i =0; i<k-3;i++)
+        {
+            if(ff(c,0,0)<ff(d,0,0))
+            {
+                next_a = a;
+                next_b = d;
+            }
+            else {
+                next_b = b;
+                next_a = a;
+            }
+
+           next_c = next_b-fi[k-i-2]/fi[k-i-1]*(next_b-next_a);
+        }
+        std::cout<<"fibo:"<<std::endl;
+        for(int i =0; i<k-3;i++)
+        {
+            if(ff(c,0,0)<ff(d,0,0))
+            {
+                next_a = a;
+                next_b = d;
+            }
+            else {
+                next_b = b;
+                next_a = a;
+            }
+
+            next_c = next_b-fi[k-i-2]/fi[k-i-1]*(next_b-next_a);
+            if (fi[i] > (b - a) / epsilon) {
+                std::cout << i << std::endl;
+                break;
+            }
+        }
+        double z;
+        //return z*=next_c;
 		return Xopt;
 	}
 	catch (string ex_info)

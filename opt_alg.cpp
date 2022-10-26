@@ -1,140 +1,152 @@
 #include"opt_alg.h"
-double* expansion(matrix(*ff)(matrix, matrix, matrix), double x, double d, double alpha, int N_max, matrix ud1, matrix ud2)
-{
-	try
-	{
-		//double* p = new double[2]{ 0,0 };
-		//Tu wpisz kod funkcji
-        static uint32_t call_count = 0;
-        call_count++;
-        int i = 0;
-        double* p = new double [2];
-        double x1 = x + d;
-        if(ff(x1,0,0) == ff(x,0,0)){
-            p[0] = x;
-            p[1] = x1;
-            return p;
+#include "user_funs.h"
+double* expansion(matrix(*ff)(matrix, matrix, matrix), double x0, double d, double alfa, int Nmax, matrix ud1, matrix ud2) {
+    int i = 0;
+    double x1 = x0 + d;
+
+    if (ff(x1, NULL, NULL) == ff(x0, NULL, NULL)) {
+        double* tab = new double[2];
+        tab[0] = x0;
+        tab[1] = x1;
+        return tab;
+    }
+
+    if (ff(x1, NULL, NULL) > ff(x0, NULL, NULL)) {
+        d = -d;
+        x1 = x0 + d;
+        if (ff(x1, NULL, NULL) >= ff(x0, NULL, NULL)) {
+            double* tab = new double[2];
+            tab[0] = x1;
+            tab[1] = x0 - d;
+            //cout << "petla: " << ff(x0, NULL, NULL);
+            //cout << "petla: " << ff(x1, NULL, NULL);
+            return tab;
+        }
+    }
+
+    vector<double> vec;
+    vec.push_back(x0);
+    vec.push_back(x1);
+
+    do {
+        if (i > Nmax) {
+            double* tab = new double;
+            *tab = 404;
+            return tab;
         }
 
-        if(ff(x1,0,0) >ff(x,0,0)){
-            d = -d;
-            x1 = x +d;
-            if(ff(x1,0,0) >= ff(x,0,0)){
-                p[0] = x1;
-                p[1] = x -d;
-                return p;
-            }
-        }
-        matrix next_x = ff(x,0,0);
-        matrix prev_x = next_x;
+        i++;
 
-        do
-        {
-            if(call_count>N_max){
-                throw;
-            }
-            i = i+1;
-            prev_x = next_x;
-            next_x = x + pow(alpha,i)*d;
+        vec.push_back(vec.at(vec.size() - 1) + alfa * d);
 
-        }
-        while(ff(prev_x,0,0) <= ff(next_x, 0, 0));
+    } while (ff(vec.at(vec.size() - 2), NULL, NULL) >= ff(vec.at(vec.size() - 1), NULL, NULL));
 
-        if(d>0)
-        {
-            p[0] = det(prev_x);
-            p[1] = det(next_x);
-            return p;
-        }
-        p[0] = det(next_x);
-        p[1] = det(prev_x);
-        std::cout<<p[0]<<std::endl<<p[1]<<std::endl;
-        return p;
-		//return p;
-	}
-	catch (string ex_info)
-	{
-		throw ("double* expansion(...):\n" + ex_info);
-	}
+    if (d > 0) {
+        double* tab = new double[2];
+        tab[0] = vec.at(vec.size() - 3);
+        tab[1] = vec.at(vec.size() - 1);
+        return tab;
+
+    }
+    else {
+        double* tab = new double[2];
+        tab[1] = vec.at(vec.size() - 1);
+        tab[0] = vec.at(vec.size() - 3);
+        return tab;
+    }
 }
 
-solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double epsilon, matrix ud1, matrix ud2)
-{
-	try
-	{
-		solution Xopt;
-		//Tu wpisz kod funkcji
-        double next_c;
-        int fi[100];
-        int k=100;
-        fi[0]=1;
-        fi[1]=1;
-        for(int i=2;i<100;i++)
-        {
-            fi[i]=fi[i-1]+fi[i-2];
+solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double epsilon) {
+    vector<double> fibNumbers;
+    fibNumbers.push_back(0);
+    fibNumbers.push_back(1);
+    for (int i = 2; i < 100; i++) {
+        fibNumbers.push_back(fibNumbers.at(i - 1) + fibNumbers.at(i - 2));
+    }
+
+    int k = 3;
+    for (int i = 0; i < fibNumbers.size(); i++) {
+        if (fibNumbers.at(i) > (b - a) / epsilon) {
+            k = i;
+            break;
         }
+    }
 
-        double c = b - fi[k-1]/(fi[k]*b-a);
-        double d = a + b - c;
-        double next_a;
-        double next_b;
-        for(int i =0; i<k-3;i++)
-        {
-            if(ff(c,0,0)<ff(d,0,0))
-            {
-                next_a = a;
-                next_b = d;
-            }
-            else {
-                next_b = b;
-                next_a = a;
-            }
+    // cout << k << endl; // jest ok
 
-           next_c = next_b-fi[k-i-2]/fi[k-i-1]*(next_b-next_a);
+    double a1, b1, c, d;
+    a1 = a;
+    b1 = b;
+    c = b1 - fibNumbers.at(k - 1) / fibNumbers.at(k) * (b1 - a1);
+    d = a + b1 - c;
+
+    for (int i = 0; i <= k - 3; i++) {
+        if (fun(c, 0, 0) < fun(d, 0, 0)) {
+            b1 = d;
         }
-        std::cout<<"fibo:"<<std::endl;
-        for(int i =0; i<k-3;i++)
-        {
-            if(ff(c,0,0)<ff(d,0,0))
-            {
-                next_a = a;
-                next_b = d;
-            }
-            else {
-                next_b = b;
-                next_a = a;
-            }
-
-            next_c = next_b-fi[k-i-2]/fi[k-i-1]*(next_b-next_a);
-            if (fi[i] > (b - a) / epsilon) {
-                std::cout << i << std::endl;
-                break;
-            }
+        else {
+            a1 = c;
         }
-        double z;
-        //return z*=next_c;
-		return Xopt;
-	}
-	catch (string ex_info)
-	{
-		throw ("solution fib(...):\n" + ex_info);
-	}
+        c = b1 - fibNumbers.at(k - i - 2) / fibNumbers.at(k - i - 1) * (b1 - a1);
+        d = a1 + b1 - c;
+    }
 
+    return c;
 }
 
-solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double epsilon, double gamma, int Nmax, matrix ud1, matrix ud2)
-{
-	try
-	{
-		solution Xopt;
-		//Tu wpisz kod funkcji
 
-		return Xopt;
-	}
-	catch (string ex_info)
-	{
-		throw ("solution lag(...):\n" + ex_info);
-	}
+solution lag(matrix(*ff)(matrix, matrix, matrix), double aInput, double bInput, double cInput, double eps, double gamma, int Nmax) {
+    int i = 0;
+    double a = aInput;
+    double b = bInput;
+    double c = cInput;
+    double l, m;
+    double fcalls = 0;
+    double d0, d=2;
+    do {
+
+        d0 = d;
+        fcalls++;
+        l = m2d(fun(a,0,0) * (b * b - c * c) + fun(b,0,0) * (c * c - a * a) + fun(c,0,0) * (a * a - b * b));
+        m = m2d(fun(a,0,0) * (b - c) + fun(b,0,0) * (c - a) + fun(c,0,0)*(a - b));
+
+        if (m <= 0) return 404;
+
+        d = 0.5 * l / m;
+
+        if (a<d && c>d) {
+            if (fun(d) < fun(c)) {
+                a = a;
+                b = c;
+                c = d;
+            }
+            else {
+                a = d;
+                c = c;
+                b = b;
+            }
+        }
+        else {
+            if (c<d && b>d)
+                if (fun(d) < fun(c)) {
+                    a = c;
+                    c = d;
+                    b = b;
+                }
+                else {
+                    a = a;
+                    c = c;
+                    b = d;
+                }
+            else return 4042;
+        }
+        i++;
+        if (fcalls > Nmax)
+            return 40422;
+
+    } //while (b - a < eps || abs(d - d0) < gamma);
+    while (b - a >= eps && abs(d - d0) >= gamma);
+    return d;
 }
 
 solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alpha, double epsilon, int Nmax, matrix ud1, matrix ud2)

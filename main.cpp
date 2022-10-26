@@ -17,22 +17,21 @@ void lab4();
 void lab5();
 void lab6();
 
-int main()
-{
-	try
-	{
-        std::cout<<expansion(fun1,69,2,0.98,100)<<std::endl;
+//proba integracji stad
+//https://pastebin.com/G1w462E5?fbclid=IwAR3jQQdnJQ7Eao81Fc-RegKdfkPv4B_-em062-cDi3Xz6GGQi2NgXyQYGsY
 
-        std::cout<<fib(fun1,2,20,1)<<std::endl;
-	}
-	catch (string EX_INFO)
-	{
-		cerr << "ERROR:\n";
-		cerr << EX_INFO << endl << endl;
-	}
-	system("pause");
-	return 0;
+int main() {
+    matrix obj(62);
+    /*  cout << fun(obj);
+
+      double* tab = expansion(fun, -20.0, 1, 2, 100000, null, null);*/
+
+    cout << fib(fun,0, 100, 0.1) << endl;
+    cout << lag(fun, 0, 100, 60, 0.1, 0.1, 1000);
+
+    // cout << tab[0] << " " << tab[1];
 }
+
 
 void lab1()
 {

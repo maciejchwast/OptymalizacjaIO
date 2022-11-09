@@ -117,9 +117,49 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 {
 	try
 	{
+        static uint32_t call_count = 0;
+        call_count++;
 		solution Xopt;
-		//Tu wpisz kod funkcji
+        double A,B,C,D, prev_D;
+		int i = 0;
+        C =(A+B)/2;//srodek przedzialu
+        do {
+            matrix l = ff(A,0,0)*(pow(B,2)) - pow(C,2) - pow(A,2)+ ff(C,0,0)*(pow(a,2))- pow(b,2);
+            matrix m = ff(A,0,0)*(B-C) + ff(B,0,0)*(C-A) + ff(C,0,0)*(A-B);
+            if(m <= 0) throw;
+            D = 0.5*det(l)/det(m);
+            if(A<D<C)
+            {
+                if(ff(D,0,0)<ff(C,0,0))
+                {
+                    C=D;
+                    B=C;
+                }
+                else
+                {
+                    A = D;
+                }
+            }
+            else if (C<D<B)
+            {
+                if(ff(D,0,0)<ff(C,0,0))
+                {
+                    A = C;
+                    C = D;
+                }
+                else
+                {
+                    B = D;
+                }
 
+            }
+            else throw;
+            i++;
+            D = prev_D;
+            if(call_count>Nmax) throw;
+        }while((B-A)<epsilon || abs(D - prev_D)<gamma);
+
+        Xopt = solution(D);
 		return Xopt;
 	}
 	catch (string ex_info)

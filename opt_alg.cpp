@@ -128,8 +128,11 @@ HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alpha, doubl
                         failed = true;
                         throw std::runtime_error("Calls exceeded!");
                     }
-                } while (X.y >= XB.y);
-            } else {
+                }
+                while (X.y >= XB.y);
+            }
+            else
+            {
                 s = alpha * s;
             }
             if (X.f_calls > Nmax) {

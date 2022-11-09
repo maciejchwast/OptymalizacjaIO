@@ -117,16 +117,17 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 {
 	try
 	{
-        static uint32_t call_count = 0;
-        call_count++;
 		solution Xopt;
         double A,B,C,D, prev_D;
+        A = a;
+        B = b;
 		int i = 0;
         C =(A+B)/2;//srodek przedzialu
         do {
-            matrix l = ff(A,0,0)*(pow(B,2)) - pow(C,2) - pow(A,2)+ ff(C,0,0)*(pow(a,2))- pow(b,2);
+            matrix l = ff(A,0,0)*(pow(B,2)) - pow(C,2) - pow(A,2)+ ff(C,0,0)*(pow(A,2))- pow(B,2);
             matrix m = ff(A,0,0)*(B-C) + ff(B,0,0)*(C-A) + ff(C,0,0)*(A-B);
-            if(m <= 0) throw;
+            if(det(m) <= 0) throw;
+            D = prev_D;
             D = 0.5*det(l)/det(m);
             if(A<D<C)
             {
@@ -155,8 +156,7 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
             }
             else throw;
             i++;
-            D = prev_D;
-            if(call_count>Nmax) throw;
+            if(i>Nmax) throw;
         }while((B-A)<epsilon || abs(D - prev_D)<gamma);
 
         Xopt = solution(D);

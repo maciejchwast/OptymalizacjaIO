@@ -58,58 +58,33 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 {
 	try
 	{
-		solution Xopt;
-		//Tu wpisz kod funkcji
-        double next_c;
-        int fi[100];
-        int k=100;
-        fi[0]=1;
-        fi[1]=1;
-        for(int i=2;i<100;i++)
+        int n = static_cast<int> (ceil(log2(sqrt(5) * (b-a) / epsilon) / log2((1+sqrt(5)) / 2)));
+        int* fib = new int[n] {1, 1};
+        for(int i = 2; i < n; i++)
         {
-            fi[i]=fi[i-1]+fi[i-2];
+            fib[i] = fib[i-2] + fib[i-1];
         }
-
-        double c = b - fi[k-1]/(fi[k]*b-a);
-        double d = a + b - c;
-        double next_a;
-        double next_b;
-        for(int i =0; i<k-3;i++)
+        solution A(a), B(b), C, D;
+        C.x = B.x - 1.0 * fib[n-2]/fib[n-1] * (B.x - A.x);
+        D.x = A.x +B.x - C.x;
+        C.fit_fun(ff,ud1, ud2);
+        D.fit_fun(ff, ud1, ud2);
+        for (int i = 0; i <= n - 3; i++)
         {
-            if(ff(c,0,0)<ff(d,0,0))
+            if(C.y<D.y)
             {
-                next_a = a;
-                next_b = d;
+                B=D;
             }
-            else {
-                next_b = b;
-                next_a = a;
-            }
-
-           next_c = next_b-fi[k-i-2]/fi[k-i-1]*(next_b-next_a);
-        }
-        std::cout<<"fibo:"<<std::endl;
-        for(int i =0; i<k-3;i++)
-        {
-            if(ff(c,0,0)<ff(d,0,0))
+            else
             {
-                next_a = a;
-                next_b = d;
+                A=C;
             }
-            else {
-                next_b = b;
-                next_a = a;
-            }
-
-            next_c = next_b-fi[k-i-2]/fi[k-i-1]*(next_b-next_a);
-            if (fi[i] > (b - a) / epsilon) {
-                std::cout << i << std::endl;
-                break;
-            }
+            C.x = B.x - 1.0 * fib[n - i - 2] / fib[n -i -1] * (B.x - A.x);
+            D.x = A.x+B.x - C.x;
+            C.fit_fun(ff, ud1, ud2);
+            D.fit_fun(ff, ud1, ud2);
         }
-        double z;
-        //return z*=next_c;
-		return Xopt;
+        return C;
 	}
 	catch (string ex_info)
 	{

@@ -64,55 +64,46 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 	{
 		solution Xopt;
 		//Tu wpisz kod funkcji
-        double next_c;
-        int fi[100];
-        int k=100;
-        fi[0]=1;
-        fi[1]=1;
+        vector <double> fibNumbers;
+        fibNumbers.push_back(0);
+        fibNumbers.push_back(1);
+
         for(int i=2;i<100;i++)
         {
-            fi[i]=fi[i-1]+fi[i-2];
+            fibNumbers.push_back(fibNumbers.at(i-1) + fibNumbers.at(i-2));
         }
 
-        double c = b - fi[k-1]/(fi[k]*b-a);
-        double d = a + b - c;
-        double next_a;
-        double next_b;
-        for(int i =0; i<k-3;i++)
+        int k =3;
+        for(int i=0;i<fibNumbers.size();i++)
         {
-            if(ff(c,0,0)<ff(d,0,0))
-            {
-                next_a = a;
-                next_b = d;
-            }
-            else {
-                next_b = b;
-                next_a = a;
-            }
-
-           next_c = next_b-fi[k-i-2]/fi[k-i-1]*(next_b-next_a);
-        }
-        std::cout<<"fibo:"<<std::endl;
-        for(int i =0; i<k-3;i++)
-        {
-            if(ff(c,0,0)<ff(d,0,0))
-            {
-                next_a = a;
-                next_b = d;
-            }
-            else {
-                next_b = b;
-                next_a = a;
-            }
-
-            next_c = next_b-fi[k-i-2]/fi[k-i-1]*(next_b-next_a);
-            if (fi[i] > (b - a) / epsilon) {
-                std::cout << i << std::endl;
+            if(fibNumbers.at(i) > (b - a) / epsilon){
+                k = i;
                 break;
             }
         }
-        double z;
-        //return z*=next_c;
+
+        double A, B, C, D;
+
+        A = a;
+        B = b;
+        C = B - fibNumbers.at(k-1) / fibNumbers.at(k) * (B-A);
+        D = A + B - C;
+
+        for(int i=0;i<=k;i++)
+        {
+            if(fun1(C)< fun1(D))
+            {
+                B=D;
+            }
+            else
+            {
+                A = C;
+            }
+            C = B - fibNumbers.at(k - i - 2) / fibNumbers.at(k-i-1) * (B-A);
+            D = A + B - C;
+        }
+
+        Xopt = solution(C);
 		return Xopt;
 	}
 	catch (string ex_info)
@@ -143,7 +134,37 @@ solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alp
 	{
 		solution Xopt;
 		//Tu wpisz kod funkcji
-
+        solution X, XB, XB_old;
+        bool failed = false;
+        do {
+            X.fit_fun(ff, ud1, ud2);
+            XB.fit_fun(ff, ud1, ud2);
+            if (X.y < XB.y) {
+                do {
+                    XB_old.x = XB.x;
+                    XB.x = X.x;
+                    X.x =  2 * XB.x - XB_old.x;
+                    X = HJ_trial(ff, XB, s);
+                    if (X.f_calls > Nmax) {
+                        failed = true;
+                        throw std::runtime_error("Calls exceeded!");
+                    }
+                }
+                while (X.y >= XB.y);
+            }
+            else
+            {
+                s = alpha * s;
+            }
+            if (X.f_calls > Nmax) {
+                failed = true;
+                throw std::runtime_error("Calls exceeded!");
+            }
+        }
+        while(s < epsilon);
+        X.fit_fun(ff,ud1,ud2);
+        Xopt = X;
+        if (failed) Xopt.flag = 1;
 		return Xopt;
 	}
 	catch (string ex_info)
@@ -157,9 +178,28 @@ solution HJ_trial(matrix(*ff)(matrix, matrix, matrix), solution XB, double s, ma
 	try
 	{
 		//Tu wpisz kod funkcji
-
-		return XB;
-	}
+        int n = get_dim(XB);
+        matrix E = ident_mat(n);
+        solution X;
+        for(int j = 0; j < n; j++){
+            X.x = XB.x+s*E[j];
+            X.fit_fun(ff,ud1,ud2);
+            if(X.y < XB.y)
+            {
+                XB = X;
+            }
+            else
+            {
+                X.x = XB.x = s*E[j];
+                X.fit_fun(ff,ud1,ud2);
+                if(X.y < XB.y)
+                {
+                    XB = X;
+                }
+            }
+        }
+        return XB;
+    }
 	catch (string ex_info)
 	{
 		throw ("solution HJ_trial(...):\n" + ex_info);
@@ -172,6 +212,11 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix x0, matrix s0, double
 	{
 		solution Xopt;
 		//Tu wpisz kod funkcji
+        solution XB(x0), X;
+        int n = get_dim(XB);
+        matrix lambda(n,1), p(n,1), s(s0), D = ident_mat(n);
+
+
 
 		return Xopt;
 	}

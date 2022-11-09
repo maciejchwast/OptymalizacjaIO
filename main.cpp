@@ -21,7 +21,8 @@ int main()
 {
 	try
 	{
-        std::cout<<expansion(fun1,69,2,0.98,100)<<std::endl;
+        double* ans = expansion(fun1,69,2,0.98,100);
+        std::cout<<ans[0]<<", "<<ans[1]<<std::endl;
 
         std::cout<<fib(fun1,2,20,1)<<std::endl;
 	}

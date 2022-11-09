@@ -1,53 +1,53 @@
 #include"opt_alg.h"
 
-double *
-expansion(matrix(*ff)(matrix, matrix, matrix), double x, double d, double alpha, int N_max, matrix ud1, matrix ud2) {
+double * expansion(matrix(*ff)(matrix, matrix, matrix), double x0, double d, double alpha, int N_max, matrix ud1,
+                   matrix ud2) {
     try {
-        //double* p = new double[2]{ 0,0 };
+        double* p = new double[2]{ 0,0 };
         //Tu wpisz kod funkcji
-        static uint32_t call_count = 0;
-        call_count++;
         int i = 0;
-        double *p = new double[2];
-        double x1 = x + d;
-        if (ff(x1, 0, 0) == ff(x, 0, 0)) {
-            p[0] = x;
-            p[1] = x1;
+        double x1  = x0 + d;
+        solution X0(x0), X1(x1), X_next(0), X_prev;
+        X0.fit_fun(ff,ud1,ud2);
+        X1.fit_fun(ff,ud1,ud2);
+        if(X0.y == X1.y)
+        {
+            p[0] = det(X0.x);
+            p[1] = det(X1.x);
             return p;
         }
-
-        if (ff(x1, 0, 0) > ff(x, 0, 0)) {
+        if(X1.y > X0.y)
+        {
             d = -d;
-            x1 = x + d;
-            if (ff(x1, 0, 0) >= ff(x, 0, 0)) {
-                p[0] = x1;
-                p[1] = x - d;
+            X1.x = X0.x + d;
+            if(X1.y >= X0.y)
+            {
+                p[0] = det(X1.x);
+                p[1] = det(X0.x)-d;
                 return p;
             }
         }
-        matrix next_x = ff(x, 0, 0);
-        matrix prev_x = next_x;
-
-        do {
-            if (call_count > N_max) {
-                throw;
+        do
+        {
+            if(X0.f_calls>N_max)
+            {
+                throw std::runtime_error("Calls number exceeded!");
             }
-            i = i + 1;
-            prev_x = next_x;
-            next_x = x + pow(alpha, i) * d;
-
-        } while (ff(prev_x, 0, 0) <= ff(next_x, 0, 0));
-
-        if (d > 0) {
-            p[0] = det(prev_x);
-            p[1] = det(next_x);
+            X_prev = X_next;
+            i++;
+            X_next.x = X0.x + pow(alpha, i)*d;
+            X_next.fit_fun(ff,ud1,ud2);
+        }
+        while(X_prev.y <= X_next.y);
+        if(d>0)
+        {
+            p[0] = det(X_prev.x);
+            p[1] = det(X_next.x)-d;
             return p;
         }
-        p[0] = det(next_x);
-        p[1] = det(prev_x);
-        std::cout << p[0] << std::endl << p[1] << std::endl;
+        p[0] = det(X_next.x);
+        p[1] = det(X_prev.x)-d;
         return p;
-        //return p;
     }
     catch (string ex_info) {
         throw ("double* expansion(...):\n" + ex_info);

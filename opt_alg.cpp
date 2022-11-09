@@ -58,7 +58,7 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 {
 	try
 	{
-        int n = static_cast<int> (ceil(log2(sqrt(5) * (b-a) / epsilon) / log2((1+sqrt(5)) / 2)));
+        int n = 100;
         int* fib = new int[n] {1, 1};
         for(int i = 2; i < n; i++)
         {

@@ -1,4 +1,5 @@
 #include"opt_alg.h"
+
 double* expansion(matrix(*ff)(matrix, matrix, matrix), double x, double d, double alpha, int N_max, matrix ud1, matrix ud2)
 {
 	try
@@ -73,7 +74,7 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
             fibNumbers.push_back(fibNumbers.at(i-1) + fibNumbers.at(i-2));
         }
 
-        int k =3;
+        int k = 100;
         for(int i=0;i<fibNumbers.size();i++)
         {
             if(fibNumbers.at(i) > (b - a) / epsilon){
@@ -82,16 +83,17 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
             }
         }
 
-        double A, B, C, D;
+        solution A, B, C, D;
 
         A = a;
         B = b;
-        C = B - fibNumbers.at(k-1) / fibNumbers.at(k) * (B-A);
-        D = A + B - C;
-
-        for(int i=0;i<=k;i++)
+        C.x = B.x - fibNumbers.at(k-1) / fibNumbers.at(k) * (B.x-A.x);
+        D.x = A.x + B.x - C.x;
+        C.fit_fun(ff,ud1,ud2);
+        D.fit_fun(ff,ud1,ud2);
+        for(int i=0;i<=k-3;i++)
         {
-            if(fun1(C)< fun1(D))
+            if(fun1(C.y)< fun1(D.y))
             {
                 B=D;
             }
@@ -99,8 +101,10 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
             {
                 A = C;
             }
-            C = B - fibNumbers.at(k - i - 2) / fibNumbers.at(k-i-1) * (B-A);
-            D = A + B - C;
+            C.x = B.x - fibNumbers.at(k - i - 2) / fibNumbers.at(k-i-1) * (B.x-A.x);
+            D.x = A.x + B.x - C.x;
+            C.fit_fun(ff,ud1,ud2);
+            D.fit_fun(ff,ud1,ud2);
         }
 
         Xopt = solution(C);
@@ -118,20 +122,24 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 	try
 	{
 		solution Xopt;
-        double A,B,C,D, prev_D;
+        double dd, prev_dd; //zeby abs dzialalo
+        solution A,B,C,D, prev_D;
         A = a;
         B = b;
 		int i = 0;
-        C =(A+B)/2;//srodek przedzialu
+        C =(A.x+B.x)/2;//srodek przedzialu
+
         do {
-            matrix l = ff(A,0,0)*(pow(B,2)) - pow(C,2) - pow(A,2)+ ff(C,0,0)*(pow(A,2))- pow(B,2);
-            matrix m = ff(A,0,0)*(B-C) + ff(B,0,0)*(C-A) + ff(C,0,0)*(A-B);
+            matrix l = ff(A.x,0,0)*(pow(B.x,2)) - pow(C.x,2) - pow(A.x,2)+ ff(C.x,0,0)*(pow(A.x,2))- pow(B.x,2);
+            matrix m = ff(A.x,0,0)*(B.x-C.x) + ff(B.x,0,0)*(C.x-A.x) + ff(C.x,0,0)*(A.x-B.x);
             if(det(m) <= 0) throw;
-            D = prev_D;
+            dd = prev_dd;
             D = 0.5*det(l)/det(m);
-            if(A<D<C)
+            dd = 0.5*det(l)/det(m);
+            D.fit_fun(ff,ud1,ud2);
+            if(A.x<D.x<C.x)
             {
-                if(ff(D,0,0)<ff(C,0,0))
+                if(ff(D.y,0,0)<ff(C.y,0,0))
                 {
                     C=D;
                     B=C;
@@ -140,10 +148,11 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
                 {
                     A = D;
                 }
+
             }
-            else if (C<D<B)
+            else if (C.x<D.x<B.x)
             {
-                if(ff(D,0,0)<ff(C,0,0))
+                if(ff(D.y,0,0)<ff(C.y,0,0))
                 {
                     A = C;
                     C = D;
@@ -157,8 +166,7 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
             else throw;
             i++;
             if(i>Nmax) throw;
-        }while((B-A)<epsilon || abs(D - prev_D)<gamma);
-
+        }while((B.x-A.x)<epsilon || fabs(dd-prev_dd)<gamma);
         Xopt = solution(D);
 		return Xopt;
 	}

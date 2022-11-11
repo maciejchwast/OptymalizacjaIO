@@ -23,12 +23,15 @@ int main()
 {
 	try
 	{
-        std::cout<<lag(fun1,1e-4,1e-2,1e-07,1e-200,1000)<<std::endl;
-        /*double* ans = expansion(fun1,69,2,0.98,100);
-        std::cout<<ans[0]<<", "<<ans[1]<<std::endl;
+
+        std::cout<<"Expansion"<<std::endl;
+        double* ans = expansion(fun1,69,2,0.98,100);
+        std::cout<<ans[0]<<", "<<ans[1]<<std::endl<<std::endl;
         std::cout<<"Fibbonacci:"<<endl;
-        std::cout<<fib(fun1,2,20,1).x<<std::endl;
-         */
+        std::cout<<fib(fun1,2,39,1)<<std::endl;
+        solution::clear_calls();
+        std::cout<<"Lagrange:"<<std::endl;
+        std::cout<<lag(fun1,10,30,0.11,0.22,1000)<<std::endl;
         fstream s;
         s.open("wyniki.txt", ios::out);
         if(!s) throw runtime_error("chuja sie stworzylo a nie plik");

@@ -212,6 +212,7 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
             }
             prev_D=D;
         }
+
 		return Xopt;
 	}
 	catch (string ex_info)

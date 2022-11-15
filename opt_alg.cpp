@@ -170,21 +170,12 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
             {
                 if(D.y<C.y)
                 {
-                    A.x=A.x;
-                    C.x=D.x;
-                    B.x=C.x;
-                    A.fit_fun(ff,ud1,ud2);
-                    B.fit_fun(ff,ud1,ud2);
-                    C.fit_fun(ff,ud1,ud2);
+                    B=C;
+                    C=D;
                 }
                 else
                 {
-                    A.x = D.x;
-                    B.x = B.x;
-                    C.x = C.x;
-                    A.fit_fun(ff,ud1,ud2);
-                    B.fit_fun(ff,ud1,ud2);
-                    C.fit_fun(ff,ud1,ud2);
+                   A=D;
                 }
 
             }
@@ -195,18 +186,11 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
                     A.x = C.x;
                     B.x = B.x;
                     C.x = D.x;
-                    A.fit_fun(ff,ud1,ud2);
-                    B.fit_fun(ff,ud1,ud2);
-                    C.fit_fun(ff,ud1,ud2);
                 }
                 else
                 {
-                    A.x = A.x;
-                    B.x = D.x;
-                    C.x = C.x;
-                    A.fit_fun(ff,ud1,ud2);
-                    B.fit_fun(ff,ud1,ud2);
-                    C.fit_fun(ff,ud1,ud2);
+                    B=D;
+
                 }
             }
             else

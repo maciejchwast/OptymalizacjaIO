@@ -9,6 +9,48 @@ matrix fun1(matrix x, matrix ud1, matrix ud2)
     y = -cos(0.1*x()) * exp(-pow((0.1 * x() - 2 * PI),2)) + 0.002*pow((0.1*x()),2);
     return y;
 }
+
+matrix funD(double t, matrix X, matrix ud1, matrix ud2)
+{
+    double Pa=0.75, Va = 5, Ta = 90; //dane zbiornika A
+    double Pb = 1, Vb = 1, Tb = 10, Db = 0.003656652; //dane zbiornika B
+    double Tin = 10, Fin = 0.01; //dane wlewajacej sie wody F- predkosc przelewu 0.01 bo zmiana z dm3 na m3
+    //dane do wzoru na zmiane objetosci
+    double a =0.98, b = 0.63, g = 9.81;
+    matrix Dx;
+    double Fa, Fb;
+    if(X(0)>0)
+    {
+        Fa = -a*b*m2d(ud1)*sqrt(2*g*X(0)/Pa);
+    }
+    else Fa = 0;
+    if(X(1)>0)
+    {
+        Fb = -a*b*Db*sqrt(2*g*X(1)/Pb);
+    }
+    else Fb = 0;
+    double Tzm = Fin/X(1) * (Tin - X(2)) + Fa / X(1) * (Ta - X(2)); //zmiana temp wody
+
+    Dx(0) = Fa;
+    Dx(1) = Fb - Fa + Fin;
+    Dx(2) = Tzm;
+    return Dx;
+}
+
+matrix funRP(matrix x, matrix ud1, matrix ud2)
+{
+    matrix y;
+    matrix X0;
+    matrix* X = solve_ode(funD, 0, 1, 1000, X0, x, ud2);
+    int l = get_len(X[0]);
+    double max = X[1](0,2);
+    for(int i =1; i<l; i++)
+    {
+        if(max < X[1](i,2)) max = X[1](i,2);
+    }
+    y = abs(max - 40);
+
+}
 /*
 double*
 expansion(matrix (*ff)(matrix, matrix, matrix), double x, double d, double alpha, int N_max, matrix ud1, matrix ud2)

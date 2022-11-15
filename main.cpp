@@ -42,43 +42,43 @@ int main()
         fstream s;
         s.open("wyniki.txt", ios::out);
         if(!s) throw runtime_error("nic sie nie stworzylo");
-        /*for(int i = 0; i<100; i++)
+        for(int i = 0; i<100; i++)
         {
-            double x0 = rand() % 101;
+            double x0 = -13.67;
             double d = -8;
             double alpha = 6.3;
             double epsilon = 1e-5;
             double gamma = 1e-200;
+            x0 = x0 +(4/7)*i;
             int Nmax = 1000;
             double *p = expansion(fun1, x0, d, alpha, Nmax);
-            cout << "X0 = " << x0<<endl;
-            cout << p[0] << "\t" << p[1] << endl;
-
+            //cout << "X0 = " << x0<<endl;
+            //cout << p[0] << "\t" << p[1] << endl;
             solution ep;
-            s<<"nr"<<i<<"\t\t"<<x0<<" "<<p[0]<<"\t"<<p[1]<<"\t"<<solution::f_calls;
+            s<<"nr"<<i<<"\t\t"<<x0<<" "<<p[0]<<"\t"<<p[1]<<"\t"<<ep.f_calls;
             s<<"\t";
-
             string c = "local";
+
             solution::clear_calls();
             solution opt_F = fib(fun1,p[0],p[1], epsilon);
             s<<"Fibbonacci"<<"\n";
             if(opt_F.x>50){
                 c = "global";
             }
-            s<<opt_F.x<<" "<<opt_F.y<<"\t"<<solution::f_calls<<"\t"<<c<<"\t";
-            */
-            /*
+            s<<opt_F.x<<" "<<opt_F.y<<"\t"<<opt_F.f_calls<<"\t"<<c<<"\t";
+
+
             solution::clear_calls();
             c = "local";
             solution opt_L = lag(fun1, p[0], p[1],epsilon,gamma,Nmax);
             s<<"Lagrange"<<"\n";
-            if(opt_F.x>50){
+            if(opt_L.x>50){
                 c = "global";
             }
             s<<opt_L.x<<" "<<opt_L.y<<"\t"<<opt_L.f_calls<<"\t"<<c<<endl;
-             */
-        //}
-        //s.close();
+
+        }
+        s.close();
     }
 	catch (string EX_INFO)
 	{

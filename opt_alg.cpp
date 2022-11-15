@@ -74,12 +74,10 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
             if(C.y< D.y)
             {
                 B=D;
-                B.fit_fun(ff,ud1,ud2);
             }
             else
             {
                 A = C;
-                A.fit_fun(ff,ud1,ud2);
             }
             C.x = B.x - 1.0 * F[n-i-2] / F[n-i-1] * (B.x-A.x);
             D.x = A.x + B.x - C.x;
@@ -88,6 +86,7 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 
             Xopt.ud.add_row((B.x-A.x)());
         }
+
         Xopt = C;
         Xopt.flag = 0;
         return Xopt;

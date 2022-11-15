@@ -32,6 +32,13 @@ int main()
         solution::clear_calls();
         std::cout<<"Lagrange:"<<std::endl;
         std::cout<<lag(fun1,-12,34,0.001,1e-6,1000)<<std::endl;
+        solution::clear_calls();
+        std::cout<<"Rzeczywisty:"<<std::endl;
+
+        std::cout<<fib(funRP,1e-4,1e-2,1e-10)<<std::endl;
+        solution::clear_calls();
+        std::cout<<lag(funRP,1e-4,1e-2,1e-10,1e-200,1000)<<std::endl;
+
         fstream s;
         s.open("wyniki.txt", ios::out);
         if(!s) throw runtime_error("nic sie nie stworzylo");

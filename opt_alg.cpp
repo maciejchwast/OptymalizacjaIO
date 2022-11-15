@@ -74,10 +74,12 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
             if(C.y< D.y)
             {
                 B=D;
+                B.fit_fun(ff,ud1,ud2);
             }
             else
             {
                 A = C;
+                A.fit_fun(ff,ud1,ud2);
             }
             C.x = B.x - 1.0 * F[n-i-2] / F[n-i-1] * (B.x-A.x);
             D.x = A.x + B.x - C.x;
@@ -142,55 +144,77 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 {
 	try
 	{
-		solution Xopt;
-        solution A,B,C,D, prev_D(a);
-        A = a;
-        B = b;
-        C =(A.x+B.x)/2;//srodek przedzialu
-        A.fit_fun(ff,ud1,ud2);
-        B.fit_fun(ff,ud1,ud2);
-        C.fit_fun(ff,ud1,ud2);
-        double l,m;
+        solution Xopt;
+        Xopt.ud = b - a;
+
+        solution A(a), B(b), C, D, prev_D(a);
+        C.x = (a + b) / 2;
+        A.fit_fun(ff, ud1, ud2);
+        B.fit_fun(ff, ud1, ud2);
+        C.fit_fun(ff, ud1, ud2);
+        double l, m;
         while(true)
         {
-            l = m2d(A.y * (pow(B.x) - pow(C.x)) + B.y * (pow(C.x) - pow(A.x)) + C.y * (pow(A.x) - pow(B.x)));
+            l = m2d(A.y * (pow(B.x) - pow(C.x)) + B.y * (pow(C.x) - pow(A.x)) + C.y *(pow(A.x) - pow(B.x)));
             m = m2d(A.y * (B.x - C.x) + B.y * (C.x - A.x) + C.y * (A.x - B.x));
-            if(m <= 0)
+            if (m <= 0)
             {
                 Xopt = prev_D;
                 Xopt.flag = 2;
                 return Xopt;
             }
-            D.x = 0.5*l/m;
-            D.fit_fun(ff,ud1,ud2);
-            if(A.x<=D.x && D.x <=C .x)
+            D.x = 0.5 * l / m;
+            D.fit_fun(ff, ud1, ud2);
+
+            if (A.x <= D.x && D.x <= C.x)
             {
                 if(D.y<C.y)
                 {
-                    C=D;
-                    B=C;
+                    A.x=A.x;
+                    C.x=D.x;
+                    B.x=C.x;
+                    A.fit_fun(ff,ud1,ud2);
+                    B.fit_fun(ff,ud1,ud2);
+                    C.fit_fun(ff,ud1,ud2);
                 }
                 else
                 {
-                    A = D;
+                    A.x = D.x;
+                    B.x = B.x;
+                    C.x = C.x;
+                    A.fit_fun(ff,ud1,ud2);
+                    B.fit_fun(ff,ud1,ud2);
+                    C.fit_fun(ff,ud1,ud2);
                 }
 
             }
-            else if (C.x<=D.x && D.x<=B.x)
+            else if (C.x <= D.x && D.x <= B.x)
             {
                 if(D.y<C.y)
                 {
-                    A = C;
-                    C = D;
+                    A.x = C.x;
+                    B.x = B.x;
+                    C.x = D.x;
+                    A.fit_fun(ff,ud1,ud2);
+                    B.fit_fun(ff,ud1,ud2);
+                    C.fit_fun(ff,ud1,ud2);
                 }
                 else
                 {
-                    B = D;
+                    A.x = A.x;
+                    B.x = D.x;
+                    C.x = C.x;
+                    A.fit_fun(ff,ud1,ud2);
+                    B.fit_fun(ff,ud1,ud2);
+                    C.fit_fun(ff,ud1,ud2);
                 }
-
             }
             else
             {
+                A.fit_fun(ff,ud1,ud2);
+                B.fit_fun(ff,ud1,ud2);
+                C.fit_fun(ff,ud1,ud2);
+
                 Xopt=prev_D;
                 Xopt.flag=2;
                 return Xopt;
@@ -200,19 +224,32 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 
             if(B.x-A.x<epsilon || abs(D.x() - prev_D.x())<gamma)
             {
+                A.fit_fun(ff,ud1,ud2);
+                B.fit_fun(ff,ud1,ud2);
+                C.fit_fun(ff,ud1,ud2);
+
                 Xopt=D;
                 Xopt.flag=0;
                 break;
             }
             if(solution::f_calls>Nmax)
             {
+                A.fit_fun(ff,ud1,ud2);
+                B.fit_fun(ff,ud1,ud2);
+                C.fit_fun(ff,ud1,ud2);
+
                 Xopt = D;
                 Xopt.flag = 1;
                 break;
             }
+            A.fit_fun(ff,ud1,ud2);
+            B.fit_fun(ff,ud1,ud2);
+            C.fit_fun(ff,ud1,ud2);
             prev_D=D;
         }
-
+        A.fit_fun(ff,ud1,ud2);
+        B.fit_fun(ff,ud1,ud2);
+        C.fit_fun(ff,ud1,ud2);
 		return Xopt;
 	}
 	catch (string ex_info)

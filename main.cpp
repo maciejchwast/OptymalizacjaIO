@@ -35,9 +35,9 @@ int main()
         solution::clear_calls();
         std::cout<<"Rzeczywisty:"<<std::endl;
 
-        std::cout<<fib(funRP,1e-4,1e-2,1e-10)<<std::endl;
+        std::cout<<fib(funRP,1e-4,1e-2,1e-7)<<std::endl;
         solution::clear_calls();
-        std::cout<<lag(funRP,1e-4,1e-2,1e-10,1e-200,1000)<<std::endl;
+        std::cout<<lag(funRP,1e-4,1e-2,1e-7,1e-200,1000)<<std::endl;
 
         fstream s;
         s.open("wyniki.txt", ios::out);

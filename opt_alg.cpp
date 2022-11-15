@@ -184,7 +184,6 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
                 if(D.y<C.y)
                 {
                     A.x = C.x;
-                    B.x = B.x;
                     C.x = D.x;
                 }
                 else
@@ -195,10 +194,6 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
             }
             else
             {
-                A.fit_fun(ff,ud1,ud2);
-                B.fit_fun(ff,ud1,ud2);
-                C.fit_fun(ff,ud1,ud2);
-
                 Xopt=prev_D;
                 Xopt.flag=2;
                 return Xopt;
@@ -231,9 +226,6 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
             C.fit_fun(ff,ud1,ud2);
             prev_D=D;
         }
-        A.fit_fun(ff,ud1,ud2);
-        B.fit_fun(ff,ud1,ud2);
-        C.fit_fun(ff,ud1,ud2);
 		return Xopt;
 	}
 	catch (string ex_info)

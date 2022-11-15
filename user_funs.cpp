@@ -22,7 +22,7 @@ matrix funRP(matrix x, matrix ud1, matrix ud2)
     {
         if(max < X[1](i,2)) max = X[1](i,2);
     }
-    y = abs(max-50);
+    y = abs(max-60);
     return y;
 }
 matrix funD(double t, matrix X, matrix ud1, matrix ud2)

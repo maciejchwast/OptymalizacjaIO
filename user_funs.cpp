@@ -50,6 +50,7 @@ matrix funD(double t, matrix X, matrix ud1, matrix ud2)
     Dx(0) = Fa;
     Dx(1) = Fb - Fa + Fin;
     Dx(2) = Tzm;
+
     return Dx;
 }
 

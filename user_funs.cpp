@@ -5,8 +5,6 @@
 
 matrix fun1(matrix x, matrix ud1, matrix ud2)
 {
-    static uint32_t call_count = 0;
-    call_count++;
     matrix y;
     y = -cos(0.1*x()) * exp(-pow((0.1 * x() - 2 * PI),2)) + 0.002*pow((0.1*x()),2);
     return y;

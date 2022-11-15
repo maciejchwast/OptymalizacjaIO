@@ -26,15 +26,19 @@ int main()
 
         std::cout<<"Expansion"<<std::endl;
         double* ans = expansion(fun1,69,2,0.98,100);
+        double* x = expansion(fun1,10,1.0,1.5,1000);
         std::cout<<ans[0]<<", "<<ans[1]<<std::endl<<std::endl;
+        std::cout<<x[0]<<", "<<x[1]<<std::endl<<std::endl;
         std::cout<<"Fibbonacci:"<<endl;
         std::cout<<fib(fun1,2,39,1)<<std::endl;
         solution::clear_calls();
+        std::cout<<fib(fun1,10,100,1e-5)<<std::endl;
+        solution::clear_calls();
         std::cout<<"Lagrange:"<<std::endl;
-        std::cout<<lag(fun1,10,30,0.11,0.22,1000)<<std::endl;
+        std::cout<<lag(fun1,-10,1,0.0001,1e-7,1000)<<std::endl;
         fstream s;
         s.open("wyniki.txt", ios::out);
-        if(!s) throw runtime_error("chuja sie stworzylo a nie plik");
+        if(!s) throw runtime_error("nic sie nie stworzylo");
         /*for(int i = 0; i<100; i++)
         {
             double x0 = rand() % 101;

@@ -4,54 +4,50 @@ double* expansion(matrix(*ff)(matrix, matrix, matrix), double x, double d, doubl
 {
 	try
 	{
-		//double* p = new double[2]{ 0,0 };
-		//Tu wpisz kod funkcji
-        static uint32_t call_count = 0;
-        call_count++;
+		double* p = new double[2]{ 0,0 };
         int i = 0;
-        double* p = new double [2];
-        double x1 = x + d;
-        if(ff(x1,0,0) == ff(x,0,0)){
-            p[0] = x;
-            p[1] = x1;
+        solution X0(x), X1(x + d);
+        X0.fit_fun(ff,ud1,ud2);
+        X1.fit_fun(ff,ud1,ud2);
+        if(X0.y == X1.y){
+            p[0] =m2d(X0.x);
+            p[1] = m2d(X1.x);
             return p;
         }
 
-        if(ff(x1,0,0) >ff(x,0,0)){
+        if(X0.y < X1.y){
             d = -d;
-            x1 = x +d;
-            if(ff(x1,0,0) >= ff(x,0,0)){
-                p[0] = x1;
-                p[1] = x -d;
+            X1.x = X0.x + d;
+            X1.fit_fun(ff,ud1,ud2);
+            if(X1.y >= X0.y){
+                p[0] = m2d(X1.x);
+                p[1] = m2d(X0.x)-d;
                 return p;
             }
         }
-        matrix next_x = ff(x,0,0);
-        matrix prev_x = next_x;
-
-        do
+        solution X2;
+        while(true)
         {
-            if(call_count>N_max){
-                throw;
+            i++;
+            X2.x = x + pow(alpha,i)*d;
+            X2.fit_fun(ff,ud1,ud2);
+            if(solution::f_calls>N_max || X2.y >= X1.y){
+                break;
             }
-            i = i+1;
-            prev_x = next_x;
-            next_x = x + pow(alpha,i)*d;
-
+            X0=X1;
+            X1=X2;
         }
-        while(ff(prev_x,0,0) <= ff(next_x, 0, 0));
 
         if(d>0)
         {
-            p[0] = det(prev_x);
-            p[1] = det(next_x);
+            p[0] = m2d(X0.x);
+            p[1] = m2d(X2.x);
             return p;
         }
-        p[0] = det(next_x);
-        p[1] = det(prev_x);
-        std::cout<<p[0]<<std::endl<<p[1]<<std::endl;
+        p[0] = m2d(X2.x);
+        p[1] = m2d(X0.x);
         return p;
-		//return p;
+
 	}
 	catch (string ex_info)
 	{
@@ -64,12 +60,37 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 	try
 	{
 		solution Xopt;
-		//Tu wpisz kod funkcji
-        vector <double> fibNumbers;
-        fibNumbers.push_back(0);
-        fibNumbers.push_back(1);
+		Xopt.ud = b-a;
+        int n = static_cast<int>(ceil(log2(sqrt(5) * (b - a) / epsilon) / log2((1 + sqrt(5)) / 2)));
+        int* F = new int[n] {1, 1};
+        for (int i = 2; i < n; ++i)
+            F[i] = F[i - 2] + F[i - 1];
+        solution A(a), B(b), C, D;
+        C.x = B.x - 1.0 * F[n - 2] / F[n - 1] * (B.x - A.x);
+        D.x = A.x + B.x - C.x;
+        C.fit_fun(ff, ud1, ud2);
+        D.fit_fun(ff, ud1, ud2);
+        for (int i = 0; i <= n - 3; ++i) {
+            if(C.y< D.y)
+            {
+                B=D;
+            }
+            else
+            {
+                A = C;
+            }
+            C.x = B.x - 1.0 * F[n-i-2] / F[n-i-1] * (B.x-A.x);
+            D.x = A.x + B.x - C.x;
+            C.fit_fun(ff,ud1,ud2);
+            D.fit_fun(ff,ud1,ud2);
 
-        for(int i=2;i<100;i++)
+            Xopt.ud.add_row((B.x-A.x)());
+        }
+        Xopt = C;
+        Xopt.flag = 0;
+        return Xopt;
+
+        /*for(int i=2;i<100;i++)
         {
             fibNumbers.push_back(fibNumbers.at(i-1) + fibNumbers.at(i-2));
         }
@@ -108,7 +129,7 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
         }
 
         Xopt = solution(C);
-		return Xopt;
+		return Xopt;*/
 	}
 	catch (string ex_info)
 	{
@@ -122,24 +143,29 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 	try
 	{
 		solution Xopt;
-        double dd, prev_dd; //zeby abs dzialalo
-        solution A,B,C,D, prev_D;
+        solution A,B,C,D, prev_D(a);
         A = a;
         B = b;
-		int i = 0;
         C =(A.x+B.x)/2;//srodek przedzialu
-
-        do {
-            matrix l = ff(A.x,0,0)*(pow(B.x,2)) - pow(C.x,2) - pow(A.x,2)+ ff(C.x,0,0)*(pow(A.x,2))- pow(B.x,2);
-            matrix m = ff(A.x,0,0)*(B.x-C.x) + ff(B.x,0,0)*(C.x-A.x) + ff(C.x,0,0)*(A.x-B.x);
-            if(det(m) <= 0) throw;
-            dd = prev_dd;
-            D = 0.5*det(l)/det(m);
-            dd = 0.5*det(l)/det(m);
-            D.fit_fun(ff,ud1,ud2);
-            if(A.x<D.x<C.x)
+        A.fit_fun(ff,ud1,ud2);
+        B.fit_fun(ff,ud1,ud2);
+        C.fit_fun(ff,ud1,ud2);
+        double l,m;
+        while(true)
+        {
+            l = m2d(A.y * (pow(B.x) - pow(C.x)) + B.y * (pow(C.x) - pow(A.x)) + C.y * (pow(A.x) - pow(B.x)));
+            m = m2d(A.y * (B.x - C.x) + B.y * (C.x - A.x) + C.y * (A.x - B.x));
+            if(m <= 0)
             {
-                if(ff(D.y,0,0)<ff(C.y,0,0))
+                Xopt = prev_D;
+                Xopt.flag = 2;
+                return Xopt;
+            }
+            D.x = 0.5*l/m;
+            D.fit_fun(ff,ud1,ud2);
+            if(A.x<=D.x && D.x <=C .x)
+            {
+                if(D.y<C.y)
                 {
                     C=D;
                     B=C;
@@ -150,9 +176,9 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
                 }
 
             }
-            else if (C.x<D.x<B.x)
+            else if (C.x<=D.x && D.x<=B.x)
             {
-                if(ff(D.y,0,0)<ff(C.y,0,0))
+                if(D.y<C.y)
                 {
                     A = C;
                     C = D;
@@ -163,11 +189,29 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
                 }
 
             }
-            else throw;
-            i++;
-            if(i>Nmax) throw;
-        }while((B.x-A.x)<epsilon || fabs(dd-prev_dd)<gamma);
-        Xopt = solution(D);
+            else
+            {
+                Xopt=prev_D;
+                Xopt.flag=2;
+                return Xopt;
+            }
+
+            Xopt.ud.add_row((B.x-A.x)());
+
+            if(B.x-A.x<epsilon || abs(D.x() - prev_D.x())<gamma)
+            {
+                Xopt=D;
+                Xopt.flag=0;
+                break;
+            }
+            if(solution::f_calls>Nmax)
+            {
+                Xopt = D;
+                Xopt.flag = 1;
+                break;
+            }
+            prev_D=D;
+        }
 		return Xopt;
 	}
 	catch (string ex_info)

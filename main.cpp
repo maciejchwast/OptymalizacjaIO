@@ -1,10 +1,10 @@
 /*********************************************
-Kod stanowi uzupe³nienie materia³ów do æwiczeñ
+Kod stanowi uzupeï¿½nienie materiaï¿½ï¿½w do ï¿½wiczeï¿½
 w ramach przedmiotu metody optymalizacji.
-Kod udostêpniony na licencji CC BY-SA 3.0
-Autor: dr in¿. £ukasz Sztangret
+Kod udostï¿½pniony na licencji CC BY-SA 3.0
+Autor: dr inï¿½. ï¿½ukasz Sztangret
 Katedra Informatyki Stosowanej i Modelowania
-Akademia Górniczo-Hutnicza
+Akademia Gï¿½rniczo-Hutnicza
 *********************************************/
 
 #include"opt_alg.h"
@@ -21,9 +21,7 @@ int main()
 {
 	try
 	{
-        expansion(fun1,69,2,0.98,100);
-
-        std::cout<<fib(fun1,2,20,1)<<std::endl;
+        cout<<HJ(fun2,1,2,3,4,5,6,7);
 	}
 	catch (string EX_INFO)
 	{

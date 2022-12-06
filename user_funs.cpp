@@ -10,7 +10,6 @@ matrix fun1(matrix x, matrix ud1, matrix ud2)
     return y;
 }
 
-
 matrix funRP(matrix x, matrix ud1, matrix ud2)
 {
     matrix y;
@@ -54,52 +53,37 @@ matrix funD(double t, matrix X, matrix ud1, matrix ud2)
     return Dx;
 }
 
-/*
-double*
-expansion(matrix (*ff)(matrix, matrix, matrix), double x, double d, double alpha, int N_max, matrix ud1, matrix ud2)
+matrix fun2(matrix x, matrix ud1, matrix ud2)
 {
-    static uint32_t call_count = 0;
-    call_count++;
-    int i = 0;
-    double* retval = new double [2];
-    double x1 = x + d;
-    if(ff(x1,0,0) == ff(x,0,0)){
-        retval[0] = x;
-        retval[1] = x1;
-        return retval;
-    }
+    matrix y;
+    y=pow(x(0),2)+pow(x(1),2)- cos(2.5*3.14*x(0)) - cos(2.5 * 3.14 *x(1)) +2;
+    return y;
+}
 
-    if(ff(x1,0,0) >ff(x,0,0)){
-        d = -d;
-        x1 = x +d;
-        if(ff(x1,0,0) >= ff(x,0,0)){
-            retval[0] = x1;
-            retval[1] = x -d;
-            return retval;
-        }
-    }
-    matrix next_x = ff(x,0,0);
-    matrix prev_x = next_x;
+matrix df(double t, matrix Y, matrix ud1, matrix ud2)
+{
+    double mr =1, mc =9, l = 0.5, b=0.5, a_ref = 3.14, o_ref = 0;
+    double I = (mr * l * l)/3 + mc * l * l, k1 = (ud2)(0), k2 = (ud2)(1);
+    double M = k1 * (a_ref -Y(0)) + k2*(o_ref - Y(1));
 
-    do
-    {
-        if(call_count>N_max){
-            throw;
-        }
-        i = i+1;
-        prev_x = next_x;
-        next_x = x + pow(alpha,i)*d;
+    matrix dY(2,1);
+    dY(0) = Y(1);
+    dY(1) = (M - b*Y(1))/I;
+    return dY;
+}
 
+matrix fun2RP(matrix x, matrix ud1, matrix ud2)
+{
+    //Y[0] to jest czas Y[1] to jest rozwi¹zanie
+    matrix y;
+    matrix Y0(2,1);
+    matrix *Y = solve_ode(df,0,0.1,100,Y0,ud1,x);
+    double a_ref = 3.14 , o_ref = 0;
+    int n = get_len(Y[0]);
+    y = 0;
+    for (int i = 0; i < n; ++i) {
+        y = y+10* pow(a_ref-Y[1](i,0), 2)+pow(o_ref - Y[1](i,1),2)+ pow(x(0)*(a_ref-Y[1](i,0))+ x(1)*(o_ref - Y[1](i,1)),2);
     }
-    while(ff(prev_x,0,0) <= ff(next_x, 0, 0));
-
-    if(d>0)
-    {
-        retval[0] = det(prev_x);
-        retval[1] = det(next_x);
-        return retval;
-    }
-    retval[0] = det(next_x);
-    retval[1] = det(prev_x);
-    return retval;
-    }*/
+    y = y*0.1;
+    return y;
+}

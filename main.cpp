@@ -12,108 +12,178 @@ Akademia G�rniczo-Hutnicza
 #include <fstream>
 #include <iostream>
 
-void lab1();
-void lab2();
-void lab3();
-void lab4();
-void lab5();
-void lab6();
+void proj1();
+void proj2();
+void proj3();
+
 
 int main()
 {
 	try
-	{
+    {
+        //proj1();
 
-        std::cout<<"Expansion"<<std::endl;
-        double* ans = expansion(fun1,69,2,0.98,100);
-        std::cout<<ans[0]<<", "<<ans[1]<<std::endl<<std::endl;
-        std::cout<<"Fibbonacci:"<<endl;
-        std::cout<<fib(fun1,2,39,1)<<std::endl;
-        solution::clear_calls();
-        std::cout<<"Lagrange:"<<std::endl;
-        std::cout<<lag(fun1,-12,34,0.001,1e-6,1000)<<std::endl;
-        solution::clear_calls();
-        std::cout<<"Rzeczywisty:"<<std::endl;
+        proj2();
 
-        std::cout<<fib(funRP,1e-4,1e-2,1e-7)<<std::endl;
-        solution::clear_calls();
-        std::cout<<lag(funRP,1e-4,1e-2,1e-7,1e-200,1000)<<std::endl;
-
-        fstream s;
-        s.open("wyniki.txt", ios::out);
-        if(!s) throw runtime_error("nic sie nie stworzylo");
-        for(int i = 0; i<100; i++)
-        {
-            double x0 = -13.67;
-            double d = -8;
-            double alpha = 6.3;
-            double epsilon = 1e-5;
-            double gamma = 1e-200;
-            x0 = x0 +(4/7)*i;
-            int Nmax = 1000;
-            double *p = expansion(fun1, x0, d, alpha, Nmax);
-            //cout << "X0 = " << x0<<endl;
-            //cout << p[0] << "\t" << p[1] << endl;
-            solution ep;
-            s<<"nr"<<i<<"\t\t"<<x0<<" "<<p[0]<<"\t"<<p[1]<<"\t"<<ep.f_calls;
-            s<<"\t";
-            string c = "local";
-
-            solution::clear_calls();
-            solution opt_F = fib(fun1,p[0],p[1], epsilon);
-            s<<"Fibbonacci"<<"\n";
-            if(opt_F.x>50){
-                c = "global";
-            }
-            s<<opt_F.x<<" "<<opt_F.y<<"\t"<<opt_F.f_calls<<"\t"<<c<<"\t";
-
-
-            solution::clear_calls();
-            c = "local";
-            solution opt_L = lag(fun1, p[0], p[1],epsilon,gamma,Nmax);
-            s<<"Lagrange"<<"\n";
-            if(opt_L.x>50){
-                c = "global";
-            }
-            s<<opt_L.x<<" "<<opt_L.y<<"\t"<<opt_L.f_calls<<"\t"<<c<<endl;
-
-        }
-        s.close();
     }
+
 	catch (string EX_INFO)
 	{
 		cerr << "ERROR:\n";
 		cerr << EX_INFO << endl << endl;
 	}
+
 	return 0;
 }
 
-void lab1()
+void proj1()
 {
+    std::cout<<"Expansion"<<std::endl;
+    double* ans = expansion(fun1,69,2,0.98,100);
+    std::cout<<ans[0]<<", "<<ans[1]<<std::endl<<std::endl;
+    std::cout<<"Fibbonacci:"<<endl;
+    std::cout<<fib(fun1,-100,100,1)<<std::endl;
+    solution::clear_calls();
+    std::cout<<"Lagrange:"<<std::endl;
+    std::cout<<lag(fun1,-12,34,0.001,1e-6,1000)<<std::endl;
+    solution::clear_calls();
+    std::cout<<"Rzeczywisty:"<<std::endl;
 
+    std::cout<<fib(funRP,1e-4,1e-2,1e-7)<<std::endl;
+    solution::clear_calls();
+    std::cout<<lag(funRP,1e-4,1e-2,1e-7,1e-200,1000)<<std::endl;
+
+    fstream s;
+    s.open("wyniki.txt", ios::out);
+    if(!s) throw runtime_error("nic sie nie stworzylo");
+    for(int i = 0; i<100; i++)
+    {
+        double x0 = 13.21 +(3.0/7.0)*i;
+        double d = -8;
+        double alpha = 6.3;
+        double epsilon = 1e-5;
+        double gamma = 1e-200;
+        int Nmax = 1000;
+
+        double *p = expansion(fun1, x0, d, alpha, Nmax);
+        //cout << "X0 = " << x0<<endl;
+        //cout << p[0] << "\t" << p[1] << endl;
+        solution ep;
+        //s<<"nr"<<i<<"\t\t"<<x0<<" "<<p[0]<<"\t"<<p[1]<<"\t"<<ep.f_calls;
+        //s<<"\t";
+        string c = "local";
+
+        solution::clear_calls();
+        solution opt_F = fib(fun1,-100,100, epsilon);
+        //s<<"Fibbonacci"<<"\n";
+        if(opt_F.x>50){
+            c = "global";
+        }
+        //s<<opt_F.x<<" "<<opt_F.y<<"\t"<<solution::f_calls<<"\t"<<c<<"\t";
+        //s<<opt_F.ud;
+
+        solution::clear_calls();
+        c = "local";
+        solution opt_L = lag(fun1, -100, 100,epsilon,gamma,Nmax);
+        s<<"Lagrange"<<"\n";
+        if(opt_L.x>50){
+            c = "global";
+        }
+        s<<opt_L.x<<" "<<opt_L.y<<"\t"<<opt_L.f_calls<<"\t"<<c<<endl;
+        //s<<opt_L.ud;
+    }
+    s.close();
+
+
+    fstream g;
+    g.open("ob.txt", ios::out);
+    double x0 = 0.0001;
+    double d = 0.001;
+    double alpha = 1.5;
+    double epsilon = 1e-7;
+    double gamma = 1e-200;
+    int Nmax = 1000;
+
+    double *p = expansion(funRP, x0, d, alpha, Nmax);
+
+    solution::clear_calls();
+    solution opt_F = fib(funRP,p[0], p[1], epsilon);
+    //cout << opt_F << endl;
+    solution::clear_calls();
+    solution opt_L = lag(funRP, p[0], p[1], epsilon, gamma, Nmax);
+    //g << opt_L;
+    cout << opt_L << endl;
+    //cout << endl;
+    matrix X0 = matrix(3, new double[3]{ 5,1,10 });
+    matrix* X = solve_ode(funD,0, 1, 1000, X0,NULL,opt_L.x);
+    g<<X[1];
 }
 
-void lab2()
-{
+void proj2() {
+    /*double s = 0.0012312312, alpha_HJ = 0.5, alpha_R = 2, beta = 0.5, epsilon = 1e-3;
+    //s - dlugosc kroku
+    int nMax = 1000;
+    matrix x0, s0(2, 1, s);
+    solution opt_HJ;
+    solution opt_R;
+    string k = "NIE";
+    for (int i = 0; i < 100; ++i) {
+        solution::clear_calls();
+        x0 = 2 * rand_mat(2, 1) - 1;
+
+        opt_HJ = HJ(fun2, x0, s, alpha_HJ, epsilon, nMax);
+
+        if (opt_HJ.y<0.01 && opt_HJ.y>(-0.01))k = "TAK"; // warunek miejsca zerowego
+        cout << x0(0) << " " << x0(1) << " " << opt_HJ.x(0) << " " << opt_HJ.x(1) << " " << opt_HJ.y << " "
+             << solution::f_calls << " " << k << "\n";
+        k = "NIE";
+
+        solution::clear_calls();
+        opt_R = Rosen(fun2, x0, s0, alpha_R, beta, epsilon, nMax);
+        if (opt_R.y<0.01 && opt_R.y>(-0.01))k = "TAK"; // warunek miejsca zerowego
+        cout << opt_R.x(0) << " " << opt_R.x(1) << " " << opt_R.y << " " << solution::f_calls << " " << k << endl;
+        //cout << opt_R<<endl;
+        k = "NIE";
+    }
+    double s = 0.1379, alpha_HJ = 0.5, alpha_R = 2, beta = 0.5, epsilon = 1e-3;
+    int nMax = 1000;
+
+    matrix x0 = 2 * rand_mat(2, 1) - 1, s0(2, 1, s);
+    matrix XS_HJ = trans(x0);
+    solution::clear_calls();
+    solution opt_HJ = HJ(fun2,x0, s, alpha_HJ, epsilon, nMax, XS_HJ);
+
+    cout<<"H:"<<endl;
+    cout<<XS_HJ[0]<<"\n"<<XS_HJ[1];
+    cout<<opt_HJ.f_calls;
+    matrix XS_R = trans(x0);
+    solution::clear_calls();
+    solution opt_R = Rosen(fun2,x0, s0, alpha_R, beta, epsilon, nMax,XS_R);
+    cout<<"\nR:"<<endl;
+    cout<<XS_R[0]<<"\n\n"<<XS_R[1];
+    cout<<opt_R.f_calls;*/
+    matrix x0(2,1,1);
+    double s = 0.1379, alpha_HJ = 0.2, alpha_R = 2, beta = 0.5, epsilon = 1e-3;
+    int nMax = 1000;
+    matrix s0(2, 1, s);
+
+    solution::clear_calls();
+    solution opt_HJ = HJ(fun2RP,x0, s, alpha_HJ, epsilon, nMax);
+    //cout<<opt_HJ<<endl;
+
+    solution::clear_calls();
+    solution opt_R = Rosen(fun2RP,x0, s0, alpha_R, beta, epsilon, nMax);
+    //cout<<opt_R<<endl;
+
+    matrix start = matrix(2, new double[2]{0,0});
+    matrix* w_hj = solve_ode(df,0,0.1,100,start,NULL,opt_HJ.x);
+    //cout<<w_hj[1]<<endl;
+
+    matrix* w_R = solve_ode(df,0,0.1,100,start,NULL,opt_R.x);
+    cout<<w_R[1]<<endl;
 
 }
-
-void lab3()
-{
-
-}
-
-void lab4()
-{
-
-}
-
-void lab5()
-{
-
-}
-
-void lab6()
+void proj3()
 {
 
 }

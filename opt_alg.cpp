@@ -237,40 +237,31 @@ solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alp
 {
 	try
 	{
-		solution Xopt;
-		//Tu wpisz kod funkcji
-        solution X, XB, XB_old;
-        bool failed = false;
-        do {
-            X.fit_fun(ff, ud1, ud2);
-            XB.fit_fun(ff, ud1, ud2);
-            if (X.y < XB.y) {
-                do {
-                    XB_old.x = XB.x;
-                    XB.x = X.x;
-                    X.x =  2 * XB.x - XB_old.x;
-                    X = HJ_trial(ff, XB, s);
-                    if (X.f_calls > Nmax) {
-                        failed = true;
-                        throw std::runtime_error("Calls exceeded!");
-                    }
+        solution XB(x0), XB_old, X;
+        XB.fit_fun(ff,ud1, ud2);
+        while (true)
+        {
+            X = HJ_trial(ff,XB, s, ud1, ud2);
+            if (X.y<XB.y) //etapy robocze wywolujemy tak dlugo az przynosza poprawe
+            {
+                while (true)
+                {
+                    XB_old = XB;
+                    XB = X;
+                    X.x = 2*XB.x -XB_old.x;
+                    X.fit_fun(ff,ud1, ud2);
+                    X = HJ_trial(ff, X, s, ud1, ud2);
+                    if (X.y>=XB.y) //jezeli jest gorszy od x bazowe
+                        break;
+                    if (solution::f_calls>Nmax) //czy nie przekroczylismy liczby iteracji
+                        return XB;
                 }
-                while (X.y >= XB.y);
             }
             else
-            {
-                s = alpha * s;
-            }
-            if (X.f_calls > Nmax) {
-                failed = true;
-                throw std::runtime_error("Calls exceeded!");
-            }
+                s*=alpha; //je¿eli nie ma poprawy zmniejszamy krok
+            if (s<epsilon || solution::f_calls>Nmax)
+                return XB;
         }
-        while(s < epsilon);
-        X.fit_fun(ff,ud1,ud2);
-        Xopt = X;
-        if (failed) Xopt.flag = 1;
-		return Xopt;
 	}
 	catch (string ex_info)
 	{
@@ -282,7 +273,6 @@ solution HJ_trial(matrix(*ff)(matrix, matrix, matrix), solution XB, double s, ma
 {
 	try
 	{
-		//Tu wpisz kod funkcji
         int n = get_dim(XB);
         matrix E = ident_mat(n);
         solution X;
@@ -295,7 +285,7 @@ solution HJ_trial(matrix(*ff)(matrix, matrix, matrix), solution XB, double s, ma
             }
             else
             {
-                X.x = XB.x = s*E[j];
+                X.x = XB.x - s*E[j];
                 X.fit_fun(ff,ud1,ud2);
                 if(X.y < XB.y)
                 {
@@ -315,15 +305,65 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix x0, matrix s0, double
 {
 	try
 	{
-		solution Xopt;
-		//Tu wpisz kod funkcji
-        solution XB(x0), X;
-        int n = get_dim(XB);
-        matrix lambda(n,1), p(n,1), s(s0), D = ident_mat(n);
+        solution X(x0), Xt;
+        int n = get_dim(X);
+        matrix l(n, 1), p(n, 1), s(s0), D = ident_mat(n); // l - lambda, p - licznik porazek, s - dlugosci krokow, d - macierz kierunkami poczatkowtmi
+        X.fit_fun(ff,ud1,ud2);
+        while (true)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                Xt.x = X.x + s(i) * D[i];
+                Xt.fit_fun(ff,ud1,ud2);
+                if (Xt.y <X.y)
+                {
+                    X = Xt;
+                    l(i) += s(i);
+                    s(i) *= alpha;
+                }
+                else
+                {
+                    s(i) *= -beta;
+                    ++p(i);
+                }
+            }
 
+            bool change = true;
+            for (int i = 0; i < n; ++i)
+                if (p(i)==0 || l(i)==0)
+                {
+                    change = false;
+                    break;
+                }
+            if (change)
+            {
+                matrix Q(n,n), v(n,1);
+                for (int i = 0; i<n; ++i)
+                    for (int j = 0; j<=i; ++j)
+                        Q(i, j) = l(i);
+                Q = D*Q;
+                v = Q[0] / norm(Q[0]);
+                D.set_col(v,0);
+                for (int i = 1; i < n; ++i)
+                {
+                    matrix temp(n,1);
+                    for (int j = 0; j < i; ++j)
+                        temp = temp + trans(Q[i]) * D[j]*D[j];
 
-
-		return Xopt;
+                    v = (Q[i] - temp) / norm(Q[i] - temp);
+                    D.set_col(v,i);
+                }
+                s = s0;
+                p = matrix(n, 1);
+                l = matrix(n, 1);
+            }
+            double max_s = abs(s(0));
+            for (int i = 1; i < n; ++i)
+                if (max_s < abs(s(i)))
+                    max_s = abs(s(i));
+            if (max_s < epsilon || solution::f_calls > Nmax)
+                return X;
+        }
 	}
 	catch (string ex_info)
 	{
@@ -331,14 +371,20 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix x0, matrix s0, double
 	}
 }
 
-solution pen(matrix(*ff)(matrix, matrix, matrix), matrix x0, double c, double dc, double epsilon, int Nmax, matrix ud1, matrix ud2)
+solution pen(matrix(*ff)(matrix, matrix, matrix), matrix x0, double c0, double dc, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
 	try {
-		solution Xopt;
-		//Tu wpisz kod funkcji
-
-		return Xopt;
-	}
+        double alpha = 1, beta = 0.5, gamma = 2, delta = 0.5, s = 0.5;
+        solution X(x0), X1;
+        matrix c(2, new double[2]{c0, dc});
+        while (true) {
+            X1 = sym_NM(ff,X.x, s, alpha, beta, gamma, delta, epsilon, Nmax, ud1, c);
+            if (norm(X1.x - X.x) < epsilon || solution::f_calls > Nmax)
+                return X1;
+            c(0) = dc * c(0); //jezeli nie konczymy zmieniamy wspolczynnik c
+            X = X1;
+        }
+    }
 	catch (string ex_info)
 	{
 		throw ("solution pen(...):\n" + ex_info);
@@ -349,10 +395,72 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 {
 	try
 	{
-		solution Xopt;
-		//Tu wpisz kod funkcji
+        int n = get_len(x0);
+        matrix D = ident_mat(n);
+        int N = n + 1;
+        solution *S = new solution[N];
+        S[0].x = x0;
+        S[0].fit_fun(ff,ud1,ud2);
+        for (int i = 1; i < N; ++i)
+        {
+            S[i].x = S[0].x + s*D[i-1];
+            S[i].fit_fun(ff,ud1,ud2);
+        }
+        solution PR, PE, PN; //PR - odbite, PE - ekspansja, PN - zawezenie
+        matrix pc; //srodek ciezkosci simpleksu
+        int i_min, i_max; //najlepszy i najgorszy wierzcholek
+        while (true)
+        {
+            i_min = i_max = 0;
+            for (int i = 1; i < N; ++i)
+            {
+                if (S[i_min].y>S[i].y)
+                    i_min = i;
+                if (S[i_max].y<S[i].y)
+                    i_max = i;
+            }
+            pc = matrix(n,1);
+            for (int i = 0; i < N; ++i)
+                if (i!=i_max)
+                    pc=pc+S[i].x;
+            pc = pc / (N-1);
+            PR.x = pc + alpha*(pc - S[i_max].x);
+            PR.fit_fun(ff,ud1,ud2);
+            if (PR.y < S[i_max].y && S[i_min].y <= PR.y)
+                S[i_max] = PR;
+            else if (PR.y<S[i_min].y)
+            {
+                PE.x = pc+gamma*(PR.x-pc);
+                PE.fit_fun(ff,ud1,ud2);
+                if (PE.y < S[i_max].y)
+                    S[i_max] = PE;
+                else
+                    S[i_max] = PR;
+            }
+            else
+            {
+                PN.x = pc+beta*(S[i_max].x-pc);
+                PN.fit_fun(ff,ud1,ud2);
+                if (PN.y < S[i_max].y)
+                    S[i_max] = PN;
+                else
+                {
+                    for (int i = 0; i < N; ++i)
+                        if (i!=i_min)
+                        {
+                            S[i].x = delta*(S[i].x+S[i_min].x);
+                            S[i].fit_fun(ff,ud1,ud2);
+                        }
+                }
+            }
 
-		return Xopt;
+            double max_s = norm(S[0].x - S[i_min].x);
+            for (int i = 1; i < N; ++i)
+                if (norm(S[i].x-S[i_min].x)>max_s)
+                    max_s = norm(S[i].x - S[i_min].x);
+            if (max_s < epsilon || solution::f_calls>Nmax)
+                return S[i_min];
+        }
 	}
 	catch (string ex_info)
 	{

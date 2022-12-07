@@ -74,7 +74,7 @@ matrix df(double t, matrix Y, matrix ud1, matrix ud2)
 
 matrix fun2RP(matrix x, matrix ud1, matrix ud2)
 {
-    //Y[0] to jest czas Y[1] to jest rozwi¹zanie
+    //Y[0] to czas Y[1] to rozwiazanie
     matrix y;
     matrix Y0(2,1);
     matrix *Y = solve_ode(df,0,0.1,100,Y0,ud1,x);
@@ -85,5 +85,49 @@ matrix fun2RP(matrix x, matrix ud1, matrix ud2)
         y = y+10* pow(a_ref-Y[1](i,0), 2)+pow(o_ref - Y[1](i,1),2)+ pow(x(0)*(a_ref-Y[1](i,0))+ x(1)*(o_ref - Y[1](i,1)),2);
     }
     y = y*0.1;
+    return y;
+}
+
+matrix fun3(matrix x, matrix ud1, matrix ud2)
+{
+    matrix y;
+    double a = PI * sqrt((pow(x(0)/PI, 2)+pow(x(1)/PI,2));
+    y = sin(a)/a;
+    if(ud2(1)>1) //zewnetrzna funkcja kary
+    {
+        if(-x(0) + 1>0)
+        {
+            y = y + ud2(0) * pow(-x(0) + 1, 2);   
+        }
+        if(-x(1) + 1>0)
+        {
+            y = y + ud2(0) * pow(-x(1) + 1, 2);
+        }
+        if(norm(x) - ud1(0) > 0)
+        {
+            y = y + ud2(0) * pow(norm(x) - ud1(0), 2);
+        }
+    }
+    else //wewnetrzna funkcja kary
+    {
+        if(-x(0) + 1 > 0)
+        {
+            y = 1e10;
+        }else {
+            y = y - ud2(0) / (-x(0) + 1);
+        }
+        if(-x(1) + 1 > 0)
+        {
+            y = 1e10;   
+        } else {
+            y = y + ud2(0) / (-x(1) + 1);
+        }
+        if(norm(x) - ud1(0) > 0)
+        {
+            y = 1e10;   
+        } else {
+            y = y + ud2(0) / (norm(x) - ud1(0));   
+        } 
+    }
     return y;
 }

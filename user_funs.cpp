@@ -131,3 +131,60 @@ matrix fun3(matrix x, matrix ud1, matrix ud2)
     }
     return y;
 }
+matrix df3(double t, matrix x, matrix ud1, matrix ud2)
+{
+    double c = 0.47;
+    double r = 0.12;
+    double m = 0.6;
+    double ro= 1.2;
+    double g = 9.81;
+    double s = PI * r * r;
+    double Dx = 0.5 * c * ro * s * abs(Y(1)) * Y(1);
+    double Dy = 0.5 * c * ro * s * abs(Y(3)) * Y(3);
+    double FMx = ro * Y(3) * PI * ud2(0) * pow(r, 3);
+    double FMy = ro * Y(1) * PI * ud2(0) * pow(r, 3);
+    matrix dY(4, 1);
+    dY(0) = (Y(1);
+    dY(1) = (-Dx - FMx) / m;
+    dY(2) = Y(3);
+    dY(3) = ( -m * g - Dy - FMy) / m;
+    return dY;
+}
+                         
+matrix fun3RP(matrix x, matrix ud1, matrix ud2)
+{
+    matrix y;
+    matrix Y0(4, new double[4]{0, x(0), 100, 0});
+    matrix *Y = solve_ode(df3, 0.001, 7, Y0, ud1, x(1));
+    int n = get_len(Y[0]);
+    int i0 = 0, i50 = 0;
+    
+    for(int i = 0; i < n; i++)
+    {
+        if(abs[Y[1](i,2) - 50) < abs(Y[1](i50, 2) - 50)
+        {
+            i50 = i;           
+        }
+        if(abs(Y[1](i,2)) < abs(Y[1](i0,2)))
+        {
+            i0 = i;   
+        }
+    }
+    
+    y = -Y[1](i0,0);
+    // 3 ograniczenia
+    if(abs(x(0)) - 10 > 0)
+    {
+        y = y + ud2(0) * pow(abs(x(0)) - 10, 2);
+    }
+    if(abs(x(1)) - 20 > 0)
+    {
+        y = y + ud2(0) * pow(abs(x(1) - 20, 2);   
+    }
+    if(abs(Y[1]](i50, 0) - 5) - 1 > 0)
+    {
+        y = y + ud2(0) * pow(abs(Y[1](i50, 0) - 5) - 1, 2);   
+    }
+    
+    return y;
+}

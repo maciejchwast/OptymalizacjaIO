@@ -15,16 +15,14 @@ Akademia G�rniczo-Hutnicza
 void proj1();
 void proj2();
 void proj3();
+void proj3RP();
 
 
 int main()
 {
 	try
     {
-        //proj1();
-
-        proj2();
-
+       proj3RP();
     }
 
 	catch (string EX_INFO)
@@ -183,7 +181,65 @@ void proj2() {
     cout<<w_R[1]<<endl;
 
 }
+
 void proj3()
 {
+    //dc dla wewnętrznej funkcji kary 0,5
+    //dc dla zewnętrznej funkcji kary 2
+
+    double c0 = 9, dc = 2, epsilon = 1e-4;
+    int Nmax = 5000;
+    matrix x0, a=4; //macierz a
+
+    do{
+        x0 = 4* rand_mat(2,1)+1;
+    }while(norm(x0)>a);
+    cout<<x0<<endl<<endl;
+
+    solution opt_zew = pen(fun3,x0,c0,dc,epsilon,Nmax,a);
+    cout<<opt_zew<<endl;
+    cout<<norm(opt_zew.x)<<endl; // w pliku xls kolumna r to odleglosc
+    // 4,00001 wskazuje na to że jest poza przedziałem
+
+    //-----------------------------------------------------------------
+
+    for (int i = 0; i < 100; ++i) {
+        //losowanie punktu startowego
+        do{
+            x0 = 4* rand_mat(2,1)+1;
+        }while(norm(x0)>a);
+
+        //zewnetrzne
+        dc = 2;
+        solution::clear_calls();
+        solution opt_zewn = pen(fun3,x0,c0,dc,epsilon,Nmax,a);
+        double r_zewn = norm(opt_zewn.x);
+        cout<<x0(0)<<"\t"<<x0(1)<<"\t"<<opt_zewn.x(0)<<"\t"<<opt_zewn.x(1)<<"\t"<<r_zewn<<"\t"<<opt_zewn.y<<"\t"<<solution::f_calls<<"\t";
+
+        //wewnetrzne
+        dc = 0.5;
+        solution::clear_calls();
+        solution opt_wewn = pen(fun3,x0,c0,dc,epsilon,Nmax,a);
+        double r_wewn = norm(opt_wewn.x);
+        cout<<opt_wewn.x(0)<<"\t"<<opt_wewn.x(1)<<"\t"<<r_wewn<<"\t"<<opt_zewn.y<<"\t"<<solution::f_calls<<"\n";
+    }
+}
+
+void proj3RP()
+{
+    matrix x(2,1,1),c=0.47, a =4;
+    double c0 = 9, dc = 2, epsilon = 1e-5;
+    int Nmax = 10000;
+    solution opt_zewn = pen(fun3RP,x,c0,dc,epsilon,Nmax,a);
+    opt_zewn.fit_fun(fun3RP,NULL, c);
+    cout<<opt_zewn<<endl;
+
+    cout<<opt_zewn.x(1)<<endl;
+
+    matrix Y(4, new double[4]{0,opt_zewn.x(0),100,0});
+    matrix ud(opt_zewn.x(1));
+    matrix * R = solve_ode(df3,0,0.01,7,Y,ud);
+    cout<<R[1];
+
 
 }

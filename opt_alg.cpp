@@ -400,15 +400,15 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
         int N = n + 1;
         solution *S = new solution[N];
         S[0].x = x0;
-        S[0].fit_fun(ff,ud1,ud2);
+        S[0].fit_fun(ff,ud1, ud2);
         for (int i = 1; i < N; ++i)
         {
             S[i].x = S[0].x + s*D[i-1];
-            S[i].fit_fun(ff,ud1,ud2);
+            S[i].fit_fun(ff,ud1, ud2);
         }
         solution PR, PE, PN; //PR - odbite, PE - ekspansja, PN - zawezenie
         matrix pc; //srodek ciezkosci simpleksu
-        int i_min, i_max; //najlepszy i najgorszy wierzcholek
+        int i_min, i_max; //najlepszy i najgorszy wiercholek
         while (true)
         {
             i_min = i_max = 0;
@@ -425,13 +425,13 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
                     pc=pc+S[i].x;
             pc = pc / (N-1);
             PR.x = pc + alpha*(pc - S[i_max].x);
-            PR.fit_fun(ff,ud1,ud2);
+            PR.fit_fun(ff,ud1, ud2);
             if (PR.y < S[i_max].y && S[i_min].y <= PR.y)
                 S[i_max] = PR;
             else if (PR.y<S[i_min].y)
             {
                 PE.x = pc+gamma*(PR.x-pc);
-                PE.fit_fun(ff,ud1,ud2);
+                PE.fit_fun(ff,ud1, ud2);
                 if (PE.y < S[i_max].y)
                     S[i_max] = PE;
                 else
@@ -440,7 +440,7 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
             else
             {
                 PN.x = pc+beta*(S[i_max].x-pc);
-                PN.fit_fun(ff,ud1,ud2);
+                PN.fit_fun(ff,ud1, ud2);
                 if (PN.y < S[i_max].y)
                     S[i_max] = PN;
                 else
@@ -449,7 +449,7 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
                         if (i!=i_min)
                         {
                             S[i].x = delta*(S[i].x+S[i_min].x);
-                            S[i].fit_fun(ff,ud1,ud2);
+                            S[i].fit_fun(ff,ud1, ud2);
                         }
                 }
             }

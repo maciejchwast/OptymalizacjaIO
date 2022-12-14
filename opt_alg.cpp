@@ -474,6 +474,38 @@ solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 	{
 		solution Xopt;
 		//Tu wpisz kod funkcji
+        int n = get_len(x0);
+        solution X0, X1;
+        X0.x = x0;
+        matrix d(n, 1), P(n,2);
+        solution h;
+        double *ab;
+
+        while (true)
+        {
+            d=-X0.grad(gf,ud1,ud2);
+
+            if (h0 < 0)
+            {
+                P.set_col(X0.x, 0);
+                P.set_col(d, 1);
+                ab = expansion(ff, 0, 1,1,Nmax,ud1,P);
+                h = golden(ff, ab[0], ab[1],epsilon,Nmax,ud1,P);
+                X1.x = X0.x+h.x+d;
+            }
+
+            X1.x = X0.x +h+d;
+
+            if(norm(X1.x - X0.x)<epsilon)
+            {   Xopt = X1;
+                break;
+            }
+            if(solution::f_calls>Nmax || solution::g_calls > Nmax)
+            {
+                break;
+            }
+            X0 = X1;
+        }
 
 		return Xopt;
 	}

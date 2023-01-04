@@ -258,7 +258,7 @@ solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alp
                 }
             }
             else
-                s*=alpha; //je¿eli nie ma poprawy zmniejszamy krok
+                s*=alpha; //jeï¿½eli nie ma poprawy zmniejszamy krok
             if (s<epsilon || solution::f_calls>Nmax)
                 return XB;
         }
@@ -518,10 +518,37 @@ solution golden(matrix(*ff)(matrix, matrix, matrix), double a, double b, double 
 {
 	try
 	{
-		solution Xopt;
-		//Tu wpisz kod funkcji
-
-		return Xopt;
+		double alfa = (sqrt(5)-1)/2;
+        solution A, B, C, D;
+        A.x = a;
+        B.x = b;
+        C.x = B.x - alfa*(B.x - A.x);
+        C.fit_fun(ff, ud1,ud2);
+        D.x = A.x + alfa*(B.x-A.x);
+        D.fit_fun(ff,ud1,ud2);
+        while(true)
+        {
+            if(C.y<D.y)
+            {
+                B=D;
+                D=C;
+                C.x = B.x - alfa*(B.x- A.x);
+                C.fit_fun(ff,ud1,ud2);
+            }
+            else
+            {
+                A=C;
+                C=D;
+                D.x = A.x + alfa*(B.x - A.x);
+                D.fit_fun(ff,ud1,ud2);
+            }
+            if(B.x - A.x <epsilon || solution::f_calls >Nmax)
+            {
+                A.x = (A.x + B.x)/2;
+                A.fit_fun(ff,ud1,ud2);
+                return A;
+            }
+        }
 	}
 	catch (string ex_info)
 	{
@@ -533,10 +560,20 @@ solution Powell(matrix(*ff)(matrix, matrix, matrix), matrix x0, double epsilon, 
 {
 	try
 	{
-		solution Xopt;
-		//Tu wpisz kod funkcji
+		int n = get_len(x0); //dlugosc wektora
+        matrix D = ident_mat(n), *A = new matrix[2]; //macierz kierunkow, m. jednostkowa
+        //A-wskaznik, A0 -punkt gdzie jestesmy, A1-kierunek
+        solution X, P, H; //X-punkt, p-p0,p1...pn,h-dlugosc kroku
+        X.x=x0;
+        double *ab;
+        while(true)
+        {
+            P=X; //start od punktu x
+            for(int i =0; i<n; i++)
+            {
 
-		return Xopt;
+            }
+        }
 	}
 	catch (string ex_info)
 	{

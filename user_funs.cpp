@@ -1,5 +1,6 @@
 #include "user_funs.h"
 #include <cmath>
+#include "solution.h"
 
 #define PI 3.14
 
@@ -181,4 +182,69 @@ matrix fun3RP(matrix x, matrix ud1, matrix ud2)
         y = y+(ud2)(0)* pow(abs(Y[1](i50,0)-5)-1,2);
     }
     return y;
+}
+
+matrix fun5(matrix x, matrix ud1, matrix ud2)
+{
+    matrix y;
+    if(ud2 == NULL)
+    {
+        y = matrix(2,1); //2 funkcje celu
+        y(0) = ud1[0]() * pow(x(0)-2, 2) + pow(x(1) -2,2);
+        y(1) = 1/ud1[0]() * (pow(x(0) + 2,2) + pow(x(1) +2,2));
+    }
+    else // y = g(alfa)
+    {
+        solution T;
+        T.x = ud2[0] +x*ud2[1]; //ud2[0] - punkt w ktorym sie obecnie znajdujemy
+        T.fit_fun(fun5,ud1,ud2);
+        y = ud1[1]()*T.y(0) + (1 - ud1[1]()) * T.y(1);
+        solution::f_calls--;
+    }
+
+}
+
+matrix fun5RP(matrix x, matrix ud1, matrix ud2)
+{
+    matrix y;
+    if(ud2 == NULL)
+    {
+        y = matrix(3,1);
+        double ro = 7800, p = 1e3, E = 207e9;
+        y(0) = ro *x(0) *3.14 * pow(x(1),2)/4; //masa
+        y(1) = 64 * p * pow(x(0),3)/(3*E*3.14*pow(x(1),4)); //ugiecie
+        y(2) = 32 * p *x(0)/(3.14*pow(x(1),3)); //naprezenie
+    }
+    else
+    {
+        matrix yt, xt = ud2[0] + x * ud2[1];
+        yt = fun5RP(xt,ud1,NULL);
+        y = ud1 * (yt(0) - 0.06)/(1.53 - 0.06) + (1 -ud1) * (yt(1) - 5.25e-6)/(0.0032 - 5.25e-6);
+
+        double c =1e10;
+        if(xt(0)<0.2)
+        {
+            y=y+c*pow(0.2 -xt(0),2);
+        } 
+        if(xt(0)>1)
+        {
+            y=y+c*pow(xt(0)-1,2);
+        } 
+        if(xt(0)<0.01)
+        {
+            y=y+c*pow(0.01-xt(1),2);
+        } 
+        if(xt(0)>0.05)
+        {
+            y=y+c*pow(xt(1)-0.05,2);
+        } 
+        if(xt(0)>0.005)
+        {
+            y=y+c*pow(yt(1)-0.005,2);
+        } 
+        if(xt(0)<300e6)
+        {
+            y=y+c*pow(yt(2)-300e6,2);
+        } 
+    }
 }

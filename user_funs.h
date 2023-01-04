@@ -15,3 +15,7 @@ matrix fun2RP(matrix, matrix, matrix);
 matrix fun3(matrix,matrix,matrix);
 matrix df3(double, matrix,matrix, matrix);
 matrix fun3RP(matrix,matrix,matrix);
+
+
+matrix fun5(matrix, matrix, matrix);
+matrix fun5RP(matrix, matrix, matrix);

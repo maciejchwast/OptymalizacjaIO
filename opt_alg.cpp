@@ -563,7 +563,7 @@ solution Powell(matrix(*ff)(matrix, matrix, matrix), matrix x0, double epsilon, 
 		int n = get_len(x0); //dlugosc wektora
         matrix D = ident_mat(n), *A = new matrix[2]; //macierz kierunkow, m. jednostkowa
         //A-wskaznik, A0 -punkt gdzie jestesmy, A1-kierunek
-        solution X, P, H; //X-punkt, p-p0,p1...pn,h-dlugosc kroku
+        solution X, P, h; //X-punkt, p-p0,p1...pn,h-dlugosc kroku
         X.x=x0;
         double *ab;
         while(true)
@@ -571,8 +571,27 @@ solution Powell(matrix(*ff)(matrix, matrix, matrix), matrix x0, double epsilon, 
             P=X; //start od punktu x
             for(int i =0; i<n; i++)
             {
-
+                    A[0] = P.x; //punkt
+                    A[1] = D[i]; //kierunek
+                    ab = expansion(ff,0,1,1.2,Nmax,ud1,*A);
+                    h = golden(ff,ab[0],ab[1],epsilon,Nmax,ud1,*A);
+                    P.x = P.x +h.x *D[i]; //przesuniecie
             }
+            if(norm(P.x - X.x) <epsilon || solution::f_calls>Nmax)
+            {
+                P.fit_fun(ff,ud1,ud2);
+                return P;
+            }
+            for(int i = 0; i<n-1; i++)
+            {
+                D.set_col(D[i+1],i); //w miejsce kolumny i wstawiamy kolumne i+1
+            }
+            D.set_col(P.x - X.x, n-1);
+            A[0] = P.x;
+            A[1] = D[n-1];
+            ab = expansion(ff, 0,1,1.2,Nmax, ud1,*A);
+            h = golden(ff,ab[0],ab[1],epsilon, Nmax,ud1,*A);
+            X.x = P.x + h.x *D[n-1]; //zmiana punktu startowego
         }
 	}
 	catch (string ex_info)

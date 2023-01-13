@@ -24,7 +24,7 @@ int main()
 {
 	try
     {
-        proj4RP();
+        proj4();
     }
 
 	catch (string EX_INFO)
@@ -253,22 +253,21 @@ void proj4()
     double h0 = -1, epsilon = 1e-5;
     int Nmax = 10000;
     solution optSD, optCG, optN;
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 100; ++i) {
         matrix x0 = 20* rand_mat(2,1)-10;
-        s<<x0(0)<<" "<<x0(1)<<" ";
+        cout<<x0(0)<<"\t"<<x0(1)<<"\t";
         optSD = SD(fun4,gf,x0,h0,epsilon,Nmax);
-        s<<optSD.x(0)<<" "<<optSD.x(1)<<" "<<optSD.y(0)<<" "<<solution::f_calls<<" "<<solution::g_calls<<" ";
+        cout<<optSD.x(0)<<"\t"<<optSD.x(1)<<"\t"<<optSD.y(0)<<"\t"<<solution::f_calls<<"\t"<<solution::g_calls<<"\t";
         solution::clear_calls();
 
         optCG = CG(fun4,gf,x0,h0,epsilon,Nmax);
-        s<<optCG.x(0)<<" "<<optCG.x(1)<<" "<<optCG.y(0)<<" "<<solution::f_calls<<" "<<solution::g_calls<<" ";
+        cout<<optCG.x(0)<<"\t"<<optCG.x(1)<<"\t"<<optCG.y(0)<<"\t"<<solution::f_calls<<"\t"<<solution::g_calls<<"\t";
         solution::clear_calls();
 
         optN = Newton(fun4,gf,hf,x0,h0,epsilon,Nmax);
-        s<<optN.x(0)<<" "<<optN.x(1)<<" "<<optN.y(0)<<" "<<solution::f_calls<<" "<<solution::g_calls<<" ";
-        s<<optN.H_calls<<"\n";
+        cout<<optN.x(0)<<"\t"<<optN.x(1)<<"\t"<<optN.y(0)<<"\t"<<solution::f_calls<<"\t"<<solution::g_calls<<"\t";
+        cout<<optN.H_calls<<"\n";
         solution::clear_calls();
-
     }
     /*
     matrix x0 = 20 * rand_mat(2, 1) - 10;

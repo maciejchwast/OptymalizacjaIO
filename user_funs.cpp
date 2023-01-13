@@ -193,7 +193,7 @@ matrix fun4(matrix x, matrix ud1, matrix ud2)
     }
     else
     {
-        y=fun4(ud2(0)+x*ud2(1),ud1,ud2);
+        y=fun4(ud2(0)+x*ud2(1),ud1);
     }
     return y;
 }

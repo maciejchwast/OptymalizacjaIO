@@ -141,3 +141,4 @@ int get_dim(const solution& A)
 		throw ("int get_dim(const solution&):\n" + ex_info);
 	}
 }
+

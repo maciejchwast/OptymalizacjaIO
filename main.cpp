@@ -16,13 +16,15 @@ void proj1();
 void proj2();
 void proj3();
 void proj3RP();
+void proj4();
+void proj4RP();
 
 
 int main()
 {
 	try
     {
-       proj3RP();
+        proj4RP();
     }
 
 	catch (string EX_INFO)
@@ -242,4 +244,111 @@ void proj3RP()
     cout<<R[1];
 
 
+}
+
+void proj4()
+{
+    fstream s;
+    s.open("lab4.txt", ios::out);
+    double h0 = -1, epsilon = 1e-5;
+    int Nmax = 10000;
+    solution optSD, optCG, optN;
+    for (int i = 0; i < 100; i++) {
+        matrix x0 = 20* rand_mat(2,1)-10;
+        s<<x0(0)<<" "<<x0(1)<<" ";
+        optSD = SD(fun4,gf,x0,h0,epsilon,Nmax);
+        s<<optSD.x(0)<<" "<<optSD.x(1)<<" "<<optSD.y(0)<<" "<<solution::f_calls<<" "<<solution::g_calls<<" ";
+        solution::clear_calls();
+
+        optCG = CG(fun4,gf,x0,h0,epsilon,Nmax);
+        s<<optCG.x(0)<<" "<<optCG.x(1)<<" "<<optCG.y(0)<<" "<<solution::f_calls<<" "<<solution::g_calls<<" ";
+        solution::clear_calls();
+
+        optN = Newton(fun4,gf,hf,x0,h0,epsilon,Nmax);
+        s<<optN.x(0)<<" "<<optN.x(1)<<" "<<optN.y(0)<<" "<<solution::f_calls<<" "<<solution::g_calls<<" ";
+        s<<optN.H_calls<<"\n";
+        solution::clear_calls();
+
+    }
+    /*
+    matrix x0 = 20 * rand_mat(2, 1) - 10;
+    double h0[] = {0.05, 0.12, -1};
+    double epsilon = 1e-3;
+    int Nmax = 1000;
+    matrix out;
+    // Najszybszy spadek
+    out = trans(x0);
+    solution::clear_calls();
+    SD(fun4, gf, x0, h0[0], epsilon, Nmax, out);
+    cout << x0<<endl;
+
+
+    out = trans(x0);
+    solution::clear_calls();
+    SD(fun4,gf,x0, h0[1], epsilon, Nmax, out);
+
+
+    out = trans(x0);
+    solution::clear_calls();
+    SD(fun4,gf,x0, h0[2], epsilon, Nmax, out);
+
+    // Gradient sprzezony
+    out = trans(x0);
+    solution::clear_calls();
+    CG(fun4,gf,x0, h0[0], epsilon, Nmax, out);
+
+
+    out = trans(x0);
+    solution::clear_calls();
+    CG(fun4,gf,x0, h0[1], epsilon, Nmax, out);
+
+
+    out = trans(x0);
+    solution::clear_calls();
+    CG(fun4,gf,x0, h0[2], epsilon, Nmax, out);
+
+
+    // Newton
+    out = trans(x0);
+    solution::clear_calls();
+    Newton(fun4,gf,hf,x0, h0[0], epsilon, Nmax, out);
+
+
+    out = trans(x0);
+    solution::clear_calls();
+    Newton(fun4,gf,hf,x0, h0[1], epsilon, Nmax, out);
+
+
+    out = trans(x0);
+    solution::clear_calls();
+    Newton(fun4,gf,hf,x0, h0[2], epsilon, Nmax, out);
+ */
+
+}
+
+void proj4RP()
+{
+    double h = 0.01, epsilon = 1.e-5;
+    int Nmax = 10000;
+    matrix x(3, new double[3]{ 0,0,0 });
+    solution sol = CG(fun4RP,gfRP,x, h, epsilon, Nmax);
+    cout << sol << endl;
+    matrix X(3, 100), Y(1, 100);
+    ifstream S("Xdata.txt");
+    S >> X;
+    S.close();
+    S.open("Ydata.txt");
+    S >> Y;
+    S.close();
+    double h0, p = 0.0;
+    for (int i = 0; i < 100; i++) {
+        h0 = (trans(sol.x) * X[i])();
+        cout << X[i];
+        h0 = 1 / (1 + exp(-h0));
+        if ((h0 >= 0.5 && Y[i] == 1) || (h0 < 0.5 && Y[i] == 0)) {
+            p++;
+        }
+    }
+    p = p / 100;
+    cout << "p= " << p << endl;
 }

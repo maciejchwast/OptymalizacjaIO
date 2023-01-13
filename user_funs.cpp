@@ -184,6 +184,92 @@ matrix fun3RP(matrix x, matrix ud1, matrix ud2)
     return y;
 }
 
+matrix fun4(matrix x, matrix ud1, matrix ud2)
+{
+    matrix y;
+    if(isnan(ud2(0,0)))
+    {
+        y=pow(x(0)+2*x(1)-7,2)+ pow(2*x(0)+x(1) - 5,2);
+    }
+    else
+    {
+        y=fun4(ud2(0)+x*ud2(1),ud1,ud2);
+    }
+    return y;
+}
+
+matrix fun4RP(matrix x, matrix ud1, matrix ud2)
+{
+    matrix y;
+    int m = 100, n = get_len(x);
+    static matrix X(n,m), Y(1,m);
+    if(solution::f_calls == 1)
+    {
+        ifstream S("XData.txt");
+        S >> X;
+        S.close();
+        S.open("YData.txt");
+        S >> Y;
+        S.close();
+    }
+    double h;
+    y = 0;
+
+    for(int i = 0; i < m ; i++){
+        h=(trans(x)*X[i])();
+        h = 1 /(1+exp(-h)); //hipoteza
+        y = y - Y(0,i) * log(h) - (1-Y(0,i)) * log(1-h);
+    }
+    y = y/m;
+}
+
+matrix gf(matrix x,matrix ud1,matrix ud2)
+{
+    matrix g(2,1);
+    g(0) = 10*x(0) + 8*x(1) - 34;
+    g(1) = 8*x(0) +10*x(1)-38;
+    return g;
+}
+
+matrix hf(matrix x, matrix ud1, matrix ud2)
+{
+    matrix H(2,2); // hesjan jest sta³y funkcja nie zmienia swojej wypukloœci ma tylko jedo minimum
+    H(0,0) = H(1,1) = 10;
+    H(0,1)=H(1,0) = 8;
+    return H;
+}
+
+matrix gfRP(matrix x, matrix ud1, matrix ud2)
+{
+    int m = 100, n = get_len(x);
+    static matrix X(n,m), Y(1,m);
+    if(solution::g_calls == 1)
+    {   ifstream S("XData.txt");
+        S >> X;
+        S.close();
+        cout << X << endl;
+        S.open("YData.txt");
+        S >> Y;
+        S.close();
+        cout << Y << endl;
+
+    }
+
+    double h;
+    matrix g(n,1);
+
+    for(int j = 0; j < n; j++)
+    {
+        for(int i = 0; i < m; i++)
+        {
+            h = (trans(x)*X[i])();
+            h = 1/(1+ exp(-h));
+            g(j) = g(j) + X(j,i) * (h- Y(0,i));
+        }
+        g(j) = g(j)/m;
+    }
+}
+
 matrix fun5(matrix x, matrix ud1, matrix ud2)
 {
     matrix y;

@@ -16,6 +16,11 @@ matrix fun3(matrix,matrix,matrix);
 matrix df3(double, matrix,matrix, matrix);
 matrix fun3RP(matrix,matrix,matrix);
 
+matrix fun4(matrix,matrix,matrix);
+matrix fun4RP(matrix,matrix,matrix);
+matrix gf(matrix,matrix,matrix);
+matrix gfRP(matrix,matrix,matrix);
+matrix hf(matrix,matrix,matrix);
 
 matrix fun5(matrix, matrix, matrix);
 matrix fun5RP(matrix, matrix, matrix);

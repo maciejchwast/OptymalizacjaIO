@@ -18,13 +18,15 @@ void proj3();
 void proj3RP();
 void proj4();
 void proj4RP();
+void proj5();
+void proj5RP();
 
 
 int main()
 {
 	try
     {
-        proj4();
+        proj5();
     }
 
 	catch (string EX_INFO)
@@ -350,4 +352,82 @@ void proj4RP()
     }
     p = p / 100;
     cout << "p= " << p << endl;
+}
+
+void proj5()
+{
+    matrix x0 = 20*rand_mat(2,1) -10, ud(2,1);
+    double epsilon = 1e-5, w = 0;
+    int Nmax = 5000, a =1;
+    ud[0] = a;
+    ud[1] = w;
+
+    solution opt = Powell(fun5,x0,epsilon,Nmax,ud);
+    //cout<<opt<<endl;
+
+    for (int i = 0; i<101; ++i) {
+        if (i == 0) { w = 0; } else { w += 0.01; };
+        x0 = 20 * rand_mat(2, 1) - 10;
+
+        a = 1;
+        ud[0] = a;
+        ud[1] = w;
+
+        solution::f_calls = 0;
+        opt = Powell(fun5, x0, epsilon, Nmax, ud);
+        cout << x0(0) << "\t" << x0(1) << "\t" << opt.x(0) << "\t" << opt.x(1) << "\t" << opt.y(0) << "\t" << opt.y(1)
+             << "\t" << solution::f_calls << "\t";
+
+        a = 10;
+        ud[0] = a;
+        ud[1] = w;
+        solution::f_calls = 0;
+        opt = Powell(fun5, x0, epsilon, Nmax, ud);
+        cout << opt.x(0) << "\t" << opt.x(1) << "\t" << opt.y(0) << "\t" << opt.y(1) << "\t" << solution::f_calls
+             << "\t";
+
+        a = 100;
+        ud[0] = a;
+        ud[1] = w;
+        solution::f_calls = 0;
+        opt = Powell(fun5, x0, epsilon, Nmax, ud);
+        cout << opt.x(0) << "\t" << opt.x(1) << "\t" << opt.y(0) << "\t" << opt.y(1) << "\t" << solution::f_calls
+             << "\n";
+    }
+}
+
+void proj5RP()
+{
+    matrix x0(2,1), ud (2,1);
+    /*
+    //min masa max ugiecie
+    x0(0) = 0.2;
+    x0(1) = 0.01;
+    solution test;
+    test.x = x0;
+    test.fit_fun(fun5RP);
+    cout<<test<<endl;
+
+    //max masa min ugiecie
+    x0(0) = 0.2;
+    x0(1) = 0.05;
+    solution test2;
+    test2.x = x0;
+    test2.fit_fun(fun5RP);
+    cout<<test2<<endl;
+*/
+    double epsilon = 1e-3;
+    int Nmax = 5000;
+    solution opt;
+    double w=0.01;
+    int a;
+
+    for (int i = 0; i < 100; ++i) {
+        x0 = 20*rand_mat(2,1) -10;
+        ud = (1,1,w);
+        opt = Powell(fun5RP,x0,epsilon,Nmax,ud);
+        cout<<opt;
+        solution::clear_calls();
+        w+=0.01;
+    }
 }

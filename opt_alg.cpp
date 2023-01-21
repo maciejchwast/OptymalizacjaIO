@@ -653,7 +653,7 @@ solution Powell(matrix(*ff)(matrix, matrix, matrix), matrix x0, double epsilon, 
             }
             if(norm(P.x - X.x) <epsilon || solution::f_calls>Nmax)
             {
-                P.fit_fun(ff,ud1,ud2);
+                P.fit_fun(ff,ud1);
                 return P;
             }
             for(int i = 0; i<n-1; i++)
